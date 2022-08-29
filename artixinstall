@@ -20,7 +20,7 @@ mount -o compress=zstd /dev/sda2 /btrfs
 btrfs subvolume create /btrfs/root
 btrfs subvolume create /btrfs/swap
 
-chattr +c /btrfs/swap
+chattr +C /btrfs/swap
 dd if=/dev/zero of=/btrfs/swap/swapfile bs=1M count=4096 status=progress
 chmod 0600 /btrfs/swap/swapfile
 mkswap -U clear /btrfs/swap/swapfile
