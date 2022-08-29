@@ -37,6 +37,4 @@ artix-chroot /mnt bash -c 'curl https://raw.githubusercontent.com/HimbeerserverD
 
 umount -R /mnt
 
-echo "Artix has been successfully installed! Press Enter to reboot."
-read
-reboot
+echo "Artix has been successfully installed! It is now safe to reboot."
