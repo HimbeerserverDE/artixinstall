@@ -1,0 +1,49 @@
+#! /bin/bash
+
+ln -sf /usr/share/zoneinfo/Europe/Berlin /etc/localtime
+hwclock --systohc
+
+sed -i "s/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/" /etc/locale.gen
+locale-gen
+
+cat <<EOT > /etc/locale.conf
+export LANG="en_US.UTF-8"
+export LC_COLLATE="C"
+EOT
+
+pacman -S --noconfirm btrfs-progs grub os-prober
+grub-install --recheck /dev/sda
+grub-mkconfig -o /boot/grub/grub.cfg
+
+echo -en 'artix\nartix' | passwd
+
+echo artix > /etc/hostname
+
+cat <<EOT > /etc/hosts
+# Static table lookup for hostnames.
+# See hosts(5) for details.
+
+127.0.0.1	localhost
+127.0.1.1	artix.local	artix
+
+# IPv6
+::1		localhost	ip6-localhost	ip6-loopback
+ff02::1	ip6-allnodes
+ff02::2	ip6-allrouters
+EOT
+
+sed -i 's/hostname="localhost"/hostname="artix"/' /etc/conf.d/hostname
+
+pacman -S --noconfirm dhcpcd
+
+cat <<EOT >> /etc/conf.d/net
+
+config_eth0="dhcp"
+EOT
+
+ln -s /etc/init.d/net.lo /etc/init.d/net.eth0
+rc-update add net.eth0 default
+
+sed -i 's/keymap="us"/keymap="de"/' /etc/conf.d/keymaps
+
+exit 0

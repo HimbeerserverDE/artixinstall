@@ -1,0 +1,42 @@
+#! /bin/bash
+
+if [ "${UID}" != "0" ]; then
+	echo "artixinstall: requires root permissions"
+	exit 1
+fi
+
+pacman -Sy --noconfirm parted
+
+parted /dev/sda mklabel msdos
+parted -a optimal /dev/sda mkpart primary ext4 0% 256MiB
+parted -a optimal /dev/sda mkpart primary btrfs 256MiB 100%
+
+mkfs.ext4 -F -L BOOT /dev/sda1
+mkfs.btrfs -f /dev/sda2
+
+mkdir /btrfs
+mount -o compress=zstd /dev/sda2 /btrfs
+
+btrfs subvolume create /btrfs/root
+btrfs subvolume create /btrfs/swap
+
+chattr +c /btrfs/swap
+dd if=/dev/zero of=/btrfs/swap/swapfile bs=1M count=4096 status=progress
+chmod 0600 /btrfs/swap/swapfile
+mkswap -U clear /btrfs/swap/swapfile
+swapon /btrfs/swap/swapfile
+
+mount --bind /btrfs/root /mnt
+mkdir /mnt/boot
+mount /dev/sda1 /mnt/boot
+
+basestrap /mnt base base-devel openrc elogind-openrc
+basestrap /mnt linux linux-firmware
+
+artix-chroot /mnt bash -c 'curl https://raw.githubusercontent.com/HimbeerserverDE/artixinstall/main/mkartix | bash'
+
+umount -R /mnt
+
+echo "Artix has been successfully installed! Press Enter to reboot."
+read
+reboot
