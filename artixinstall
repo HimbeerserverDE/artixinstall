@@ -20,8 +20,10 @@ mount -o compress=zstd /dev/sda2 /btrfs
 btrfs subvolume create /btrfs/root
 btrfs subvolume create /btrfs/swap
 
+SWAPSIZE=$(( ($(free -g | grep Mem | awk '{print $2}') + 1) * 2048 ))
+
 chattr +C /btrfs/swap
-dd if=/dev/zero of=/btrfs/swap/swapfile bs=1M count=4096 status=progress
+dd if=/dev/zero of=/btrfs/swap/swapfile bs=1M count=${SWAPSIZE} status=progress
 chmod 0600 /btrfs/swap/swapfile
 mkswap -U clear /btrfs/swap/swapfile
 swapon /btrfs/swap/swapfile
