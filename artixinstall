@@ -5,7 +5,7 @@ if [ "${UID}" != "0" ]; then
 	exit 1
 fi
 
-pacman -Sy --noconfirm parted
+pacman -Sy --noconfirm parted btrfs-progs
 
 parted /dev/sda mklabel msdos
 parted -a optimal /dev/sda mkpart primary ext4 0% 256MiB
