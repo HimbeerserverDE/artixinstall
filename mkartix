@@ -46,4 +46,11 @@ rc-update add net.eth0 default
 
 sed -i 's/keymap="us"/keymap="de"/' /etc/conf.d/keymaps
 
+# Custom software
+## Rm
+pacman -R --noconfirm sudo
+
+## Add
+pacman -S --noconfirm vim
+
 exit 0
