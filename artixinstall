@@ -33,6 +33,8 @@ mount /dev/sda1 /mnt/boot
 basestrap /mnt base base-devel openrc elogind-openrc
 basestrap /mnt linux linux-firmware
 
+fstabgen -U /mnt >> /mnt/etc/fstab
+
 artix-chroot /mnt bash -c 'curl https://raw.githubusercontent.com/HimbeerserverDE/artixinstall/main/mkartix | bash'
 
 umount -R /mnt
