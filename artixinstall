@@ -7,9 +7,9 @@ fi
 
 pacman -Sy --noconfirm parted
 
-parted /dev/sda mklabel msdos
-parted -a optimal /dev/sda mkpart primary ext4 0% 256MiB
-parted -a optimal /dev/sda mkpart primary btrfs 256MiB 100%
+parted -s /dev/sda mklabel msdos
+parted -s -a optimal /dev/sda mkpart primary ext4 0% 256MiB
+parted -s -a optimal /dev/sda mkpart primary btrfs 256MiB 100%
 
 mkfs.ext4 -F -L BOOT /dev/sda1
 mkfs.btrfs -f /dev/sda2
