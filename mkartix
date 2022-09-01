@@ -64,9 +64,13 @@ Server = https://mirror1.cl.netactuate.com/artix/universe/$arch
 Server = https://ftp.crifo.org/artix-universe/
 EOT
 
-pacman-key -u
+pacman-key --init
+pacman-key --populate
+pacman-key --refresh-keys
+
 pacman -Sy --noconfirm artix-archlinux-support
-pacman-key -u
+
+pacman-key --refresh-keys
 
 cat <<EOT >> /etc/pacman.conf
 
