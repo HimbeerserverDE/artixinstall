@@ -34,7 +34,7 @@ EOT
 
 sed -i 's/hostname="localhost"/hostname="artix"/' /etc/conf.d/hostname
 
-pacman -S --noconfirm dhcpcd
+pacman -S --noconfirm dhclient
 
 cat <<EOT >> /etc/conf.d/net
 
