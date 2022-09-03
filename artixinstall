@@ -14,21 +14,9 @@ parted -s -a optimal /dev/sda mkpart primary btrfs 256MiB 100%
 mkfs.ext4 -F -L BOOT /dev/sda1
 mkfs.btrfs -f /dev/sda2
 
-mkdir /btrfs
-mount -o compress=zstd /dev/sda2 /btrfs
-
 btrfs subvolume create /btrfs/root
-btrfs subvolume create /btrfs/swap
 
-SWAPSIZE=$(( ($(free -g | grep Mem | awk '{print $2}') + 1) * 2048 ))
-
-chattr +C /btrfs/swap
-dd if=/dev/zero of=/btrfs/swap/swapfile bs=1M count=${SWAPSIZE} status=progress
-chmod 0600 /btrfs/swap/swapfile
-mkswap -U clear /btrfs/swap/swapfile
-swapon /btrfs/swap/swapfile
-
-mount --bind /btrfs/root /mnt
+mount -o compress=zstd,subvol=/root /btrfs/root /mnt
 mkdir /mnt/boot
 mount /dev/sda1 /mnt/boot
 
