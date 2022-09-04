@@ -20,6 +20,8 @@ mount -o compress=zstd,subvol=/root /btrfs/root /mnt
 mkdir /mnt/boot
 mount /dev/sda1 /mnt/boot
 
+rc-service ntpd start
+
 basestrap /mnt base base-devel openrc elogind-openrc
 basestrap /mnt linux linux-firmware
 
