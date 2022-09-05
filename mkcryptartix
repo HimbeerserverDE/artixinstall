@@ -17,7 +17,7 @@ sed -i 's/HOOKS=(base udev autodetect modconf block filesystems keyboard fsck)/H
 
 pacman -S --noconfirm lvm2 cryptsetup
 
-pacman -S --noconfirm grub os-prober device-mapper-openrc cryptsetup-openrc
+pacman -S --noconfirm btrfs-progs grub os-prober device-mapper-openrc cryptsetup-openrc
 
 grub-install --recheck /dev/sda
 grub-mkconfig -o /boot/grub/grub.cfg
