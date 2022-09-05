@@ -7,7 +7,8 @@ if [ "${UID}" != "0" ]; then
 	exit 1
 fi
 
-pacman -Sy --noconfirm parted
+pacman -Sy
+pacman -S --noconfirm parted
 
 #
 # Full Disk Encryption
@@ -41,7 +42,7 @@ rc-service ntpd start
 basestrap /mnt base base-devel openrc elogind-openrc
 basestrap /mnt linux linux-firmware
 
-artix-chroot /mnt bash -c 'curl https://raw.githubusercontent.com/HimbeerserverDE/artixinstall/main/mkcryptartix | bash'
+artix-chroot /mnt bash -c 'curl -fsSL https://raw.githubusercontent.com/HimbeerserverDE/artixinstall/main/mkcryptartix | bash'
 
 fstabgen -U /mnt >> /mnt/etc/fstab
 

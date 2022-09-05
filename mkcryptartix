@@ -109,7 +109,7 @@ pacman -Sy
 pacman -R --noconfirm sudo
 
 ## Add
-pacman -Sy --noconfirm vim ntpd
+pacman -S --noconfirm vim ntpd
 rc-update add ntpd default
 
 exit 0
