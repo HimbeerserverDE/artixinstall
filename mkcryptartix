@@ -56,11 +56,60 @@ rc-update add net.eth0 default
 
 sed -i 's/keymap="us"/keymap="de"/' /etc/conf.d/keymaps
 
+# Repositories
+## Artix
+cat <<EOT >> /etc/pacman.conf
+
+#
+# Custom
+#
+
+# Artix
+
+[universe]
+Server = https://universe.artixlinux.org/\$arch
+Server = https://mirror1.artixlinux.org/universe/\$arch
+Server = https://mirror.pascalpuffke.de/artix-universe/\$arch
+Server = https://artixlinux.qontinuum.space/artixlinux/universe/os/\$arch
+Server = https://mirror1.cl.netactuate.com/artix/universe/\$arch
+Server = https://ftp.crifo.org/artix-universe/
+EOT
+
+## Arch
+pacman -Sy --noconfirm artix-archlinux-support
+
+cat <<EOT >> /etc/pacman.conf
+
+# Arch
+
+#[testing]
+#Include = /etc/pacman.d/mirrorlist-arch
+
+[extra]
+Include = /etc/pacman.d/mirrorlist-arch
+
+#[community-testing]
+#Include = /etc/pacman.d/mirrorlist-arch
+
+[community]
+Include = /etc/pacman.d/mirrorlist-arch
+
+#[multilib-testing]
+#Include = /etc/pacman.d/mirrorlist-arch
+
+#[multilib]
+#Include = /etc/pacman.d/mirrorlist-arch
+EOT
+
+pacman-key --populate archlinux
+pacman -Sy
+
 # Custom software
 ## Rm
 pacman -R --noconfirm sudo
 
 ## Add
-pacman -Sy --noconfirm vim
+pacman -Sy --noconfirm vim ntpd
+rc-update add ntpd default
 
 exit 0
