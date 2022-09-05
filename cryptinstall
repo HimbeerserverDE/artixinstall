@@ -24,7 +24,7 @@ mkfs.ext4 -F -L BOOT /dev/sda1
 mkfs.btrfs -f /dev/mapper/sda2_crypt
 
 mkdir /btrfs
-mount -o compress=zstd /dev/sda2 /btrfs
+mount -o compress=zstd /dev/mapper/sda2_crypt /btrfs
 btrfs subvolume create /btrfs/root
 umount /btrfs
 
