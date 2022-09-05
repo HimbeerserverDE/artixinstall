@@ -13,12 +13,12 @@ export LANG="en_US.UTF-8"
 export LC_COLLATE="C"
 EOT
 
-sed -i 's/HOOKS=(base udev autodetect modconf block filesystems keyboard fsck)/HOOKS=(base udev autodetect modconf block keyboard keymap encrypt filesystems fsck)/' /etc/mkinitcpio.conf
+sed -i "s/HOOKS=(base udev autodetect modconf block filesystems keyboard fsck)/HOOKS=(base udev autodetect modconf block keyboard keymap encrypt filesystems fsck)/" /etc/mkinitcpio.conf
 
 pacman -S --noconfirm btrfs-progs lvm2 cryptsetup grub os-prober device-mapper-openrc cryptsetup-openrc
 
 UUID=$(blkid -s UUID -o value /dev/sda2)
-sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet"/GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet cryptdevice=UUID=${UUID}:sda2_crypt"/' /etc/default/grub
+sed -i "s/GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet\"/GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet cryptdevice=UUID=${UUID}:sda2_crypt\"/" /etc/default/grub
 
 grub-install --recheck /dev/sda
 grub-mkconfig -o /boot/grub/grub.cfg
