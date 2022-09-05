@@ -13,7 +13,7 @@ export LANG="en_US.UTF-8"
 export LC_COLLATE="C"
 EOT
 
-pacman -S --noconfirm btrfs-progs grub os-prober
+pacman -S --needed --noconfirm btrfs-progs grub os-prober
 grub-install --recheck /dev/sda
 grub-mkconfig -o /boot/grub/grub.cfg
 
@@ -36,7 +36,7 @@ EOT
 
 sed -i 's/hostname="localhost"/hostname="artix"/' /etc/conf.d/hostname
 
-pacman -S --noconfirm dhclient
+pacman -S --needed --noconfirm dhclient
 
 cat <<EOT >> /etc/conf.d/net
 
@@ -68,7 +68,7 @@ Server = https://ftp.crifo.org/artix-universe/
 EOT
 
 ## Arch
-pacman -Sy --noconfirm artix-archlinux-support
+pacman -Sy --needed --noconfirm artix-archlinux-support
 
 cat <<EOT >> /etc/pacman.conf
 
