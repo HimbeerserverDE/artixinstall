@@ -19,6 +19,7 @@ pacman -S --needed --noconfirm btrfs-progs lvm2 cryptsetup grub os-prober device
 
 UUID=$(blkid -s UUID -o value /dev/sda2)
 sed -i "s/GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet\"/GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet cryptdevice=UUID=${UUID}:sda2_crypt\"/" /etc/default/grub
+sed -i "s/#GRUB_ENABLE_CRYPTODISK=y/GRUB_ENABLE_CRYPTODISK=y/" /etc/default/grub
 
 grub-install --recheck /dev/sda
 grub-mkconfig -o /boot/grub/grub.cfg

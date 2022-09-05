@@ -18,10 +18,13 @@ parted -s /dev/sda mklabel msdos
 parted -s -a optimal /dev/sda mkpart primary ext4 0% 256MiB
 parted -s -a optimal /dev/sda mkpart primary ext4 256MiB 100%
 
+echo "artix" | cryptsetup -q luksFormat /dev/sda1
+echo "artix" | cryptsetup -q open /dev/sda1 sda1_crypt
+
 echo "artix" | cryptsetup -q luksFormat /dev/sda2
 echo "artix" | cryptsetup -q open /dev/sda2 sda2_crypt
 
-mkfs.ext4 -F -L BOOT /dev/sda1
+mkfs.ext4 -F -L BOOT /dev/mapper/sda1_crypt
 mkfs.btrfs -f /dev/mapper/sda2_crypt
 
 mkdir /btrfs
@@ -31,7 +34,7 @@ umount /btrfs
 
 mount -o compress=zstd,subvol=/root /dev/mapper/sda2_crypt /mnt
 mkdir /mnt/boot
-mount /dev/sda1 /mnt/boot
+mount /dev/mapper/sda1_crypt /mnt/boot
 
 #
 # Continue Installation
