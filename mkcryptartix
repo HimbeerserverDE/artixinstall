@@ -27,7 +27,7 @@ grub-mkconfig -o /boot/grub/grub.cfg
 mkinitcpio -p linux
 
 # Enable GRUB to unlock /boot
-CRYPTO_UUID=$(blkid -s UUID -o value /dev/sda | tr -d -)
+CRYPTO_UUID=$(blkid -s UUID -o value /dev/sda1 | tr -d -)
 cat <<EOT > /boot/grub/grub-pre.cfg
 set crypto_uuid=${CRYPTO_UUID}
 cryptomount -u \$crypto_uuid
