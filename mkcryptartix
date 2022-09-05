@@ -39,7 +39,7 @@ insmod normal
 normal
 EOT
 
-grub-mkimage -p /boot/grub -c /boot/grub/grub-pre.cfg -o /boot/grub/i386-pc/core.img -O i386-pc disk biosdisk diskfilter luks2 part_msdos cryptodisk gcry_rijndael pbkdf2 gcry_sha256 ext2
+grub-mkimage -p /boot/grub -c /boot/grub/grub-pre.cfg -o /boot/grub/i386-pc/core.img -O i386-pc disk diskfilter luks2 part_msdos cryptodisk gcry_rijndael pbkdf2 gcry_sha256 ext2
 grub-bios-setup -d /boot/grub/i386-pc /dev/sda
 
 echo -en 'artix\nartix' | passwd
