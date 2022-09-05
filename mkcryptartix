@@ -104,12 +104,8 @@ EOT
 pacman-key --populate archlinux
 pacman -Sy
 
-# Custom software
-## Rm
 pacman -R --noconfirm sudo
 
-## Add
-pacman -S --noconfirm vim ntpd
 rc-update add ntpd default
 
 exit 0
