@@ -20,7 +20,7 @@ parted -s -a optimal /dev/sda mkpart primary ext4 256MiB 100%
 echo "artix" | cryptsetup -q luksFormat /dev/sda2
 echo "artix" | cryptsetup -q open /dev/sda2 sda2_crypt
 
-mkfs.fat -F -L BOOT /dev/sda1
+mkfs.ext4 -F -L BOOT /dev/sda1
 mkfs.btrfs -f /dev/mapper/sda2_crypt
 
 mount /dev/mapper/sda2_crypt /mnt
