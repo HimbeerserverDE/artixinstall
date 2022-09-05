@@ -50,6 +50,8 @@ artix-chroot /mnt bash -c 'curl -fsSL https://raw.githubusercontent.com/Himbeers
 fstabgen -U /mnt >> /mnt/etc/fstab
 
 umount -R /mnt
+
+cryptsetup -q close sda1_crypt
 cryptsetup -q close sda2_crypt
 
 echo "Artix has been successfully installed! It is now safe to reboot."
