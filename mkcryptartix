@@ -33,7 +33,7 @@ set crypto_uuid=${CRYPTO_UUID}
 cryptomount -u \$crypto_uuid
 
 set root=crypto0
-set prefix=($root)/grub
+set prefix=(\$root)/grub
 
 insmod normal
 normal
