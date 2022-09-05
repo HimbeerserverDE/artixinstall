@@ -39,7 +39,7 @@ mount /dev/sda1 /mnt/boot
 
 rc-service ntpd start
 
-basestrap /mnt base base-devel openrc elogind-openrc vim ntpd
+basestrap /mnt base base-devel openrc elogind-openrc vim ntp
 basestrap /mnt linux linux-firmware
 
 artix-chroot /mnt bash -c 'curl -fsSL https://raw.githubusercontent.com/HimbeerserverDE/artixinstall/main/mkcryptartix | bash'
