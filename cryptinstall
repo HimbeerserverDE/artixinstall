@@ -1,0 +1,51 @@
+#! /bin/bash
+
+set -e
+
+if [ "${UID}" != "0" ]; then
+	echo "artixinstall: requires root permissions"
+	exit 1
+fi
+
+pacman -Sy --noconfirm parted
+
+#
+# Full Disk Encryption
+#
+
+parted -s /dev/sda mklabel msdos
+parted -s -a optimal /dev/sda mkpart primary ext4 0% 100%
+parted -s /dev/sda set 1 boot on
+parted -s /dev/sda set 1 lvm on
+
+echo "artix" | cryptsetup -q luksFormat /dev/sda1
+echo "artix" | cryptsetup -q open /dev/sda1 sda1_crypt
+
+pvcreate /dev/mapper/sda1_crypt
+vgcreate artix-vg /dev/mapper/sda1_crypt
+lvcreate --contiguous y --size 256M artix-vg --name boot
+lvcreate --contiguous y --extents +100%FREE artix-vg --name root
+
+mkfs.fat -n BOOT /dev/artix-vg/boot
+mkfs.ext4 -L ROOT /dev/artix-vg/root
+
+mount /dev/artix-vg/root /mnt
+mkdir /mnt/boot
+mount /dev/artix-vg/boot /mnt/boot
+
+#
+# Continue Installation
+#
+
+rc-service ntpd start
+
+basestrap /mnt base base-devel openrc elogind-openrc
+basestrap /mnt linux linux-firmware
+
+artix-chroot /mnt bash -c 'curl https://raw.githubusercontent.com/HimbeerserverDE/artixinstall/main/mkcryptartix | bash'
+
+fstabgen -U /mnt >> /mnt/etc/fstab
+
+umount -R /mnt
+
+echo "Artix has been successfully installed! It is now safe to reboot."
