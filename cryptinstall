@@ -23,7 +23,12 @@ echo "artix" | cryptsetup -q open /dev/sda2 sda2_crypt
 mkfs.ext4 -F -L BOOT /dev/sda1
 mkfs.btrfs -f /dev/mapper/sda2_crypt
 
-mount /dev/mapper/sda2_crypt /mnt
+mkdir /btrfs
+mount -o compress=zstd /dev/sda2 /btrfs
+btrfs subvolume create /btrfs/root
+umount /btrfs
+
+mount -o compress=zstd,subvol=/root /dev/mapper/sda2_crypt /mnt
 mkdir /mnt/boot
 mount /dev/sda1 /mnt/boot
 
