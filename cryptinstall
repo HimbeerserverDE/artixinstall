@@ -18,7 +18,7 @@ parted -s /dev/sda mklabel msdos
 parted -s -a optimal /dev/sda mkpart primary ext4 0% 256MiB
 parted -s -a optimal /dev/sda mkpart primary ext4 256MiB 100%
 
-echo "artix" | cryptsetup -q luksFormat /dev/sda1
+echo "artix" | cryptsetup -q --hash pbkdf2 luksFormat /dev/sda1
 echo "artix" | cryptsetup -q open /dev/sda1 sda1_crypt
 
 echo "artix" | cryptsetup -q luksFormat /dev/sda2
