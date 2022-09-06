@@ -17,6 +17,21 @@ sed -i "s/HOOKS=(base udev autodetect modconf block filesystems keyboard fsck)/H
 
 pacman -S --needed --noconfirm btrfs-progs lvm2 cryptsetup grub os-prober device-mapper-openrc cryptsetup-openrc
 
+BOOT_UUID=$(blkid -s UUID -o value /dev/sda1)
+
+dd bs=512 count=4 if=/dev/random of=/crypto_boot.bin iflag=fullblock
+chmod 600 /crypto_boot.bin
+echo "artix" | cryptsetup -q luksAddKey /dev/sda1 /crypto_boot.bin
+
+cat <<EOT >> /etc/conf.d/dmcrypt
+
+target='boot_crypt'
+source='/dev/disk/by-uuid/${BOOT_UUID}'
+key='/crypto_boot.bin'
+EOT
+
+rc-update add dmcrypt boot
+
 UUID=$(blkid -s UUID -o value /dev/sda2)
 sed -i "s/GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet\"/GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet cryptdevice=UUID=${UUID}:root_crypt\"/" /etc/default/grub
 sed -i "s/#GRUB_ENABLE_CRYPTODISK=y/GRUB_ENABLE_CRYPTODISK=y/" /etc/default/grub
