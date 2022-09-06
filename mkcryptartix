@@ -53,9 +53,11 @@ echo -en 'ckbcomp\nckbcomp' | passwd ckbcomp
 
 git clone https://aur.archlinux.org/ckbcomp-bin.git /tmp/ckbcomp-bin
 chown -R ckbcomp:ckbcomp /tmp/ckbcomp-bin
-(cd /tmp/ckbcomp-bin && su ckbcomp -c 'makepkg' && pacman -U $(find -name "*.pkg.tar.zst"))
+(cd /tmp/ckbcomp-bin && su ckbcomp -c 'makepkg')
 
 userdel ckbcomp
+
+cp -p /tmp/ckbcomp-bin/pkg/ckbcomp-bin/usr/bin/ckbcomp /usr/local/bin/ckbcomp
 
 grub-kbdcomp -o /boot/grub/keymap.gkb de
 (cd /boot/grub && tar cf memdisk.tar keymap.gkb)
