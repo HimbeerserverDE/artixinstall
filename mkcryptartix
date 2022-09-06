@@ -20,6 +20,7 @@ pacman -S --needed --noconfirm btrfs-progs lvm2 cryptsetup grub os-prober device
 UUID=$(blkid -s UUID -o value /dev/sda2)
 sed -i "s/GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet\"/GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet cryptdevice=UUID=${UUID}:sda2_crypt\"/" /etc/default/grub
 sed -i "s/#GRUB_ENABLE_CRYPTODISK=y/GRUB_ENABLE_CRYPTODISK=y/" /etc/default/grub
+sed -i "s/GRUB_TERMINAL_INPUT=console/GRUB_TERMINAL_INPUT=at_keyboard/" /etc/default/grub
 
 grub-install --recheck /dev/sda
 grub-mkconfig -o /boot/grub/grub.cfg
@@ -29,6 +30,12 @@ mkinitcpio -p linux
 # Enable GRUB to unlock /boot
 CRYPTO_UUID=$(blkid -s UUID -o value /dev/sda1 | tr -d -)
 cat <<EOT > /boot/grub/grub-pre.cfg
+set root=(memdisk)
+set prefix=(\$root)/
+
+terminal_input at_keyboard
+keymap /keymap.gkb
+
 set crypto_uuid=${CRYPTO_UUID}
 cryptomount -u \$crypto_uuid
 
@@ -39,7 +46,20 @@ insmod normal
 normal
 EOT
 
-grub-mkimage -p /boot/grub -c /boot/grub/grub-pre.cfg -o /boot/grub/i386-pc/core.img -O i386-pc disk biosdisk diskfilter luks2 part_msdos cryptodisk gcry_rijndael pbkdf2 gcry_sha256 ext2
+pacman -S --needed --noconfirm libxkbcommon-x11 # XKB layouts
+
+useradd ckbcomp
+echo -en 'ckbcomp\nckbcomp' | passwd ckbcomp
+
+git clone https://aur.archlinux.org/ckbcomp-bin.git /tmp/ckbcomp-bin
+(cd /tmp/ckbcomp-bin && su ckbcomp -c 'makepkg' && pacman -U '*.tar.zst')
+
+userdel ckbcomp
+
+grub-kbdcomp -o /boot/grub/keymap.gkb de
+(cd /boot/grub && tar cf memdisk.tar keymap.gkb)
+
+grub-mkimage -p /boot/grub -c /boot/grub/grub-pre.cfg -o /boot/grub/i386-pc/core.img -O i386-pc -m /boot/grub/memdisk.tar disk biosdisk diskfilter luks2 part_msdos cryptodisk gcry_rijndael pbkdf2 gcry_sha256 ext2 memdisk tar at_keyboard keylayouts terminal
 grub-bios-setup -d /boot/grub/i386-pc /dev/sda
 
 echo -en 'artix\nartix' | passwd
