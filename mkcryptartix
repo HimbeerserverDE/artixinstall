@@ -18,7 +18,7 @@ sed -i "s/HOOKS=(base udev autodetect modconf block filesystems keyboard fsck)/H
 pacman -S --needed --noconfirm btrfs-progs lvm2 cryptsetup grub os-prober device-mapper-openrc cryptsetup-openrc
 
 UUID=$(blkid -s UUID -o value /dev/sda2)
-sed -i "s/GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet\"/GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet cryptdevice=UUID=${UUID}:sda2_crypt\"/" /etc/default/grub
+sed -i "s/GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet\"/GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet cryptdevice=UUID=${UUID}:root_crypt\"/" /etc/default/grub
 sed -i "s/#GRUB_ENABLE_CRYPTODISK=y/GRUB_ENABLE_CRYPTODISK=y/" /etc/default/grub
 sed -i "s/GRUB_TERMINAL_INPUT=console/GRUB_TERMINAL_INPUT=at_keyboard/" /etc/default/grub
 

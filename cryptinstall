@@ -19,20 +19,20 @@ parted -s -a optimal /dev/sda mkpart primary ext4 0% 256MiB
 parted -s -a optimal /dev/sda mkpart primary ext4 256MiB 100%
 
 echo "artix" | cryptsetup -q --pbkdf pbkdf2 luksFormat /dev/sda1
-echo "artix" | cryptsetup -q open /dev/sda1 sda1_crypt
+echo "artix" | cryptsetup -q open /dev/sda1 boot_crypt
 
 echo "artix" | cryptsetup -q luksFormat /dev/sda2
-echo "artix" | cryptsetup -q open /dev/sda2 sda2_crypt
+echo "artix" | cryptsetup -q open /dev/sda2 root_crypt
 
-mkfs.ext4 -F -L BOOT /dev/mapper/sda1_crypt
-mkfs.btrfs -f /dev/mapper/sda2_crypt
+mkfs.ext4 -F -L BOOT /dev/mapper/boot_crypt
+mkfs.btrfs -f /dev/mapper/root_crypt
 
 mkdir /btrfs
-mount -o compress=zstd /dev/mapper/sda2_crypt /btrfs
+mount -o compress=zstd /dev/mapper/root_crypt /btrfs
 btrfs subvolume create /btrfs/root
 umount /btrfs
 
-mount -o compress=zstd,subvol=/root /dev/mapper/sda2_crypt /mnt
+mount -o compress=zstd,subvol=/root /dev/mapper/root_crypt /mnt
 mkdir /mnt/boot
 mount /dev/mapper/sda1_crypt /mnt/boot
 
@@ -51,7 +51,7 @@ fstabgen -U /mnt >> /mnt/etc/fstab
 
 umount -R /mnt
 
-cryptsetup -q close sda1_crypt
-cryptsetup -q close sda2_crypt
+cryptsetup -q close boot_crypt
+cryptsetup -q close root_crypt
 
 echo "Artix has been successfully installed! It is now safe to reboot."
