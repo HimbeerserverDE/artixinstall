@@ -52,6 +52,7 @@ useradd ckbcomp
 echo -en 'ckbcomp\nckbcomp' | passwd ckbcomp
 
 git clone https://aur.archlinux.org/ckbcomp-bin.git /tmp/ckbcomp-bin
+chown -R ckbcomp:ckbcomp /tmp/ckbcomp-bin
 (cd /tmp/ckbcomp-bin && su ckbcomp -c 'makepkg' && pacman -U '*.tar.zst')
 
 userdel ckbcomp
