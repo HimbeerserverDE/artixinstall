@@ -34,7 +34,7 @@ umount /btrfs
 
 mount -o compress=zstd,subvol=/root /dev/mapper/root_crypt /mnt
 mkdir /mnt/boot
-mount /dev/mapper/sda1_crypt /mnt/boot
+mount /dev/mapper/boot_crypt /mnt/boot
 
 #
 # Continue Installation
