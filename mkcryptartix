@@ -26,7 +26,7 @@ dd bs=512 count=4 if=/dev/random of=/crypto_keyfile.bin iflag=fullblock
 chmod 600 /crypto_keyfile.bin
 echo "artix" | cryptsetup -q luksAddKey /dev/sda2 /crypto_keyfile.bin
 
-sed -i "s/FILES=()/FILES=(/crypto_keyfile.bin)/" /etc/mkinitcpio.conf
+sed -i "s/FILES=()/FILES=(\/crypto_keyfile.bin)/" /etc/mkinitcpio.conf
 
 grub-install --recheck /dev/sda
 grub-mkconfig -o /boot/grub/grub.cfg
