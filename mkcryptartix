@@ -22,6 +22,12 @@ sed -i "s/GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet\"/GRUB_CMDLINE_LINUX_DEF
 sed -i "s/#GRUB_ENABLE_CRYPTODISK=y/GRUB_ENABLE_CRYPTODISK=y/" /etc/default/grub
 sed -i "s/GRUB_TERMINAL_INPUT=console/GRUB_TERMINAL_INPUT=at_keyboard/" /etc/default/grub
 
+dd bs=512 count=4 if=/dev/random of=/crypto_keyfile.bin iflag=fullblock
+chmod 600 /crypto_keyfile.bin
+cryptsetup luksAddKey /dev/sda2 /crypto_keyfile.bin
+
+sed -i "s/FILES=()/FILES=(/crypto_keyfile.bin)/" /etc/mkinitcpio.conf
+
 grub-install --recheck /dev/sda
 grub-mkconfig -o /boot/grub/grub.cfg
 
