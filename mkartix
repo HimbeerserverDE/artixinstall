@@ -2,6 +2,10 @@
 
 set -e
 
+function get_cmdline {
+	sed -r 's/[[:alnum:]]+=/\n&/g' file | awk -F= '$1=="$1"{print $2}'
+}
+
 DRIVE=$1
 PART_PREFIX=$2
 
@@ -10,7 +14,8 @@ if [[ -z "${DRIVE}" ]] | [[ -z "${PART_PREFIX}" ]]; then
 	exit 1
 fi
 
-ln -sf /usr/share/zoneinfo/Europe/Berlin /etc/localtime
+TIMEZONE=$(get_cmdline tz)
+ln -sf "/usr/share/zoneinfo/${TIMEZONE}" /etc/localtime
 hwclock --systohc
 
 sed -i "s/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/" /etc/locale.gen
@@ -44,7 +49,8 @@ EOT
 
 sed -i 's/hostname="localhost"/hostname="artix"/' /etc/conf.d/hostname
 
-sed -i 's/keymap="us"/keymap="de"/' /etc/conf.d/keymaps
+KEYMAP=$(get_cmdline keytable)
+sed -i "s/keymap=\"us\"/keymap=\"${KEYMAP}\"/" /etc/conf.d/keymaps
 
 # Repositories
 ## Artix

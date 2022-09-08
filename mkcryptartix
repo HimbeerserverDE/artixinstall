@@ -2,6 +2,10 @@
 
 set -e
 
+function get_cmdline {
+	sed -r 's/[[:alnum:]]+=/\n&/g' file | awk -F= '$1=="Var"{print $2}'
+}
+
 DRIVE=$1
 PART_PREFIX=$2
 
@@ -10,7 +14,8 @@ if [[ -z "${DRIVE}" ]] | [[ -z "${PART_PREFIX}" ]]; then
 	exit 1
 fi
 
-ln -sf /usr/share/zoneinfo/Europe/Berlin /etc/localtime
+TIMEZONE=$(get_cmdline tz)
+ln -sf "/usr/share/zoneinfo/${TIMEZONE}" /etc/localtime
 hwclock --systohc
 
 sed -i "s/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/" /etc/locale.gen
@@ -88,7 +93,9 @@ userdel ckbcomp
 
 cp -p /tmp/ckbcomp-bin/pkg/ckbcomp-bin/usr/bin/ckbcomp /usr/local/bin/ckbcomp
 
-grub-kbdcomp -o /boot/grub/keymap.gkb de
+KEYMAP=$(get_cmdline keytable)
+
+grub-kbdcomp -o /boot/grub/keymap.gkb ${KEYMAP}
 (cd /boot/grub && tar cf memdisk.tar keymap.gkb)
 
 grub-mkimage -p /boot/grub -c /boot/grub/grub-pre.cfg -o /boot/grub/i386-pc/core.img -O i386-pc -m /boot/grub/memdisk.tar disk biosdisk diskfilter luks2 part_msdos cryptodisk gcry_rijndael pbkdf2 gcry_sha256 ext2 memdisk tar at_keyboard keylayouts terminal
