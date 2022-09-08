@@ -37,4 +37,6 @@ fstabgen -U /mnt >> /mnt/etc/fstab
 
 umount -R /mnt
 
-echo "Artix has been successfully installed! It is now safe to reboot."
+echo -e "\n\e[1m\e[1;32mArtix has been successfully installed! It is now safe to reboot."
+echo -e "\e[1m\e[1;32mDon't forget to change the root password and hostname."
+echo -en "\e[0m"
