@@ -5,3 +5,8 @@ Fully automated Artix Linux installer for my testing setup
 1. Boot the artix installer with language en_US, timezone Europe/Berlin and keymap de.
 2. Login as root (password artix).
 3. Now run the script: `curl -fSSL https://raw.githubusercontent.com/HimbeerserverDE/artixinstall/main/artixinstall | sh`
+
+# Automated install
+1. Boot the artix installer with language en_US, timezone Europe/Berlin and keymap de.
+2. Login as root (password artix).
+3. Run the script with parameters: `curl -fsSL https://raw.githubusercontent.com/HimbeerserverDE/artixinstall/main/<artix | crypt>install | sh -s -- <drive>`
