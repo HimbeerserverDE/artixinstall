@@ -13,7 +13,7 @@ EOT
 
 sed -i "s/HOOKS=(base udev autodetect modconf block filesystems keyboard fsck)/HOOKS=(base udev autodetect modconf block keyboard keymap encrypt filesystems fsck)/" /etc/mkinitcpio.conf
 
-pacman -S --needed --noconfirm btrfs-progs cryptsetup grub os-prober device-mapper-openrc cryptsetup-openrc
+pacman -S --needed --noconfirm btrfs-progs grub os-prober device-mapper-openrc cryptsetup-openrc
 
 BOOT_UUID=$(blkid -s UUID -o value /dev/sda1)
 
