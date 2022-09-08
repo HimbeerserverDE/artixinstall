@@ -14,7 +14,7 @@ pacman -S --needed --noconfirm parted fzf
 # Config questions
 #
 
-DRIVE=$(lsblk | grep disk | fzf --disabled)
+DRIVE="/dev/$(lsblk | grep disk | fzf --disabled)"
 
 if [[ "${DRIVE}" == "/dev/mmcblk"* ]] | [[ "${DRIVE}" == "/dev/nvme"* ]]; then
 	PART_PREFIX="${DRIVE}p"
