@@ -8,21 +8,37 @@ if [ "${UID}" != "0" ]; then
 fi
 
 pacman -Sy
-pacman -S --needed --noconfirm parted
+pacman -S --needed --noconfirm parted fzf
+
+#
+# Config questions
+#
+
+DRIVE=$1
+
+if [ -z "${DRIVE}" ]; then
+	DRIVE="/dev/$(lsblk | grep disk | fzf --disabled | awk '{print $1}')"
+fi
+
+if [[ "${DRIVE}" == "/dev/mmcblk"* ]] | [[ "${DRIVE}" == "/dev/nvme"* ]]; then
+	PART_PREFIX="${DRIVE}p"
+else
+	PART_PREFIX="${DRIVE}"
+fi
 
 #
 # Full Disk Encryption
 #
 
-parted -s /dev/sda mklabel msdos
-parted -s -a optimal /dev/sda mkpart primary ext4 0% 256MiB
-parted -s -a optimal /dev/sda mkpart primary ext4 256MiB 100%
+parted -s ${DRIVE} mklabel msdos
+parted -s -a optimal ${DRIVE} mkpart primary ext4 0% 256MiB
+parted -s -a optimal ${DRIVE} mkpart primary ext4 256MiB 100%
 
-echo "artix" | cryptsetup -q --pbkdf pbkdf2 luksFormat /dev/sda1
-echo "artix" | cryptsetup -q open /dev/sda1 boot_crypt
+echo "artix" | cryptsetup -q --pbkdf pbkdf2 luksFormat ${PART_PREFIX}1
+echo "artix" | cryptsetup -q open ${PART_PREFIX}1 boot_crypt
 
-echo "artix" | cryptsetup -q luksFormat /dev/sda2
-echo "artix" | cryptsetup -q open /dev/sda2 root_crypt
+echo "artix" | cryptsetup -q luksFormat ${PART_PREFIX}2
+echo "artix" | cryptsetup -q open ${PART_PREFIX}2 root_crypt
 
 mkfs.ext4 -F -L BOOT /dev/mapper/boot_crypt
 mkfs.btrfs -f /dev/mapper/root_crypt
@@ -57,7 +73,7 @@ cryptsetup -q close root_crypt
 echo -e "\n\e[1m\e[1;32mArtix has been successfully installed! It is now safe to reboot."
 echo -e "\e[1m\e[1;32mDon't forget to change the root password, disk passwords and hostname."
 echo -e "\e[1m\e[1;32mRun the following commands to change the disk passwords:"
-echo -e "\e[1m\e[1;32m\t# cryptsetup --pbkdf pbkdf2 luksChangeKey /dev/sda1"
-echo -e "\e[1m\e[1;32m\t# cryptsetup luksChangeKey /dev/sda2"
+echo -e "\e[1m\e[1;32m\t# cryptsetup --pbkdf pbkdf2 luksChangeKey ${PART_PREFIX}1"
+echo -e "\e[1m\e[1;32m\t# cryptsetup luksChangeKey ${PART_PREFIX}2"
 echo -e "\n\e[1m\e[1;32mChoose US compatible passwords as GRUB uses the US keyboard layout."
 echo -en "\e[0m"

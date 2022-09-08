@@ -2,6 +2,14 @@
 
 set -e
 
+DRIVE=$1
+PART_PREFIX=$2
+
+if [[ -z "${DRIVE}" ]] | [[ -z "${PART_PREFIX}" ]]; then
+	echo -e "\e[1m\e[1;31mUsage: mkcryptartix <drive> <partition prefix>\e[0m"
+	exit 1
+fi
+
 ln -sf /usr/share/zoneinfo/Europe/Berlin /etc/localtime
 hwclock --systohc
 
@@ -17,11 +25,11 @@ sed -i "s/HOOKS=(base udev autodetect modconf block filesystems keyboard fsck)/H
 
 pacman -S --needed --noconfirm btrfs-progs grub os-prober device-mapper-openrc cryptsetup-openrc
 
-BOOT_UUID=$(blkid -s UUID -o value /dev/sda1)
+BOOT_UUID=$(blkid -s UUID -o value ${PART_PREFIX}1)
 
 dd bs=512 count=4 if=/dev/random of=/crypto_boot.bin iflag=fullblock
 chmod 600 /crypto_boot.bin
-echo "artix" | cryptsetup -q luksAddKey /dev/sda1 /crypto_boot.bin
+echo "artix" | cryptsetup -q luksAddKey ${PART_PREFIX}1 /crypto_boot.bin
 
 cat <<EOT >> /etc/conf.d/dmcrypt
 
@@ -32,24 +40,24 @@ EOT
 
 rc-update add dmcrypt boot
 
-UUID=$(blkid -s UUID -o value /dev/sda2)
+UUID=$(blkid -s UUID -o value ${PART_PREFIX}2)
 sed -i "s/GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet\"/GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet cryptdevice=UUID=${UUID}:root_crypt\"/" /etc/default/grub
 sed -i "s/#GRUB_ENABLE_CRYPTODISK=y/GRUB_ENABLE_CRYPTODISK=y/" /etc/default/grub
 sed -i "s/GRUB_TERMINAL_INPUT=console/GRUB_TERMINAL_INPUT=at_keyboard/" /etc/default/grub
 
 dd bs=512 count=4 if=/dev/random of=/crypto_keyfile.bin iflag=fullblock
 chmod 600 /crypto_keyfile.bin
-echo "artix" | cryptsetup -q luksAddKey /dev/sda2 /crypto_keyfile.bin
+echo "artix" | cryptsetup -q luksAddKey ${PART_PREFIX}2 /crypto_keyfile.bin
 
 sed -i "s/FILES=()/FILES=(\/crypto_keyfile.bin)/" /etc/mkinitcpio.conf
 
-grub-install --recheck /dev/sda
+grub-install --recheck ${DRIVE}
 grub-mkconfig -o /boot/grub/grub.cfg
 
 mkinitcpio -p linux
 
 # Enable GRUB to unlock /boot
-CRYPTO_UUID=$(blkid -s UUID -o value /dev/sda1 | tr -d -)
+CRYPTO_UUID=$(blkid -s UUID -o value ${PART_PREFIX}1 | tr -d -)
 cat <<EOT > /boot/grub/grub-pre.cfg
 set root=(memdisk)
 set prefix=(\$root)/
@@ -84,7 +92,7 @@ grub-kbdcomp -o /boot/grub/keymap.gkb de
 (cd /boot/grub && tar cf memdisk.tar keymap.gkb)
 
 grub-mkimage -p /boot/grub -c /boot/grub/grub-pre.cfg -o /boot/grub/i386-pc/core.img -O i386-pc -m /boot/grub/memdisk.tar disk biosdisk diskfilter luks2 part_msdos cryptodisk gcry_rijndael pbkdf2 gcry_sha256 ext2 memdisk tar at_keyboard keylayouts terminal
-grub-bios-setup -d /boot/grub/i386-pc /dev/sda
+grub-bios-setup -d /boot/grub/i386-pc ${DRIVE}
 
 echo -en 'artix\nartix' | passwd
 
