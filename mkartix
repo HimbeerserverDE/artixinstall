@@ -3,7 +3,7 @@
 set -e
 
 function get_cmdline {
-	sed -r 's/[[:alnum:]]+=/\n&/g' file | awk -F= '$1=="$1"{print $2}'
+	sed -r 's/[[:alnum:]]+=/\n&/g' file | awk -F= "\$1==\"$1\"{print \$2}"
 }
 
 # cmdline options
