@@ -94,6 +94,8 @@ grub-kbdcomp -o /boot/grub/keymap.gkb de
 grub-mkimage -p /boot/grub -c /boot/grub/grub-pre.cfg -o /boot/grub/i386-pc/core.img -O i386-pc -m /boot/grub/memdisk.tar disk biosdisk diskfilter luks2 part_msdos cryptodisk gcry_rijndael pbkdf2 gcry_sha256 ext2 memdisk tar at_keyboard keylayouts terminal
 grub-bios-setup -d /boot/grub/i386-pc ${DRIVE}
 
+pacman -Rns --noconfirm libxkbcommon-x11 # Not needed by all users
+
 echo -en 'artix\nartix' | passwd
 
 echo artix > /etc/hostname
