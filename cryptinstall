@@ -3,7 +3,7 @@
 set -e
 
 if [ "${UID}" != "0" ]; then
-	echo "artixinstall: requires root permissions"
+	echo "cryptinstall: requires root permissions"
 	exit 1
 fi
 
