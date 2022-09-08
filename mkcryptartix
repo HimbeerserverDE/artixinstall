@@ -97,7 +97,7 @@ userdel ckbcomp
 
 cp -p /tmp/ckbcomp-bin/pkg/ckbcomp-bin/usr/bin/ckbcomp /usr/local/bin/ckbcomp
 
-grub-kbdcomp -o /boot/grub/keymap.gkb ${KEYMAP}
+grub-kbdcomp -o /boot/grub/keymap.gkb -rules evdev ${KEYMAP}
 (cd /boot/grub && tar cf memdisk.tar keymap.gkb)
 
 grub-mkimage -p /boot/grub -c /boot/grub/grub-pre.cfg -o /boot/grub/${TARGET}/core.img -O ${TARGET} -m /boot/grub/memdisk.tar disk biosdisk diskfilter luks2 part_msdos cryptodisk gcry_rijndael pbkdf2 gcry_sha256 ext2 memdisk tar at_keyboard keylayouts terminal
