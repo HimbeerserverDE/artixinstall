@@ -6,30 +6,40 @@ if [ "${UID}" != "0" ]; then
 fi
 
 pacman -Sy
-pacman -S --needed --noconfirm parted
+pacman -S --needed --noconfirm parted fzf
 
-parted -s /dev/sda mklabel msdos
-parted -s -a optimal /dev/sda mkpart primary ext4 0% 256MiB
-parted -s -a optimal /dev/sda mkpart primary btrfs 256MiB 100%
+while [ -z "${DRIVE}" ]; do
+	DRIVE=$(lsblk | grep disk | fzf --disabled)
+done
 
-mkfs.ext4 -F -L BOOT /dev/sda1
-mkfs.btrfs -f /dev/sda2
+if [[ "${DRIVE}" == "/dev/mmcblk"* ]] | [[ "${DRIVE}" == "/dev/nvme"* ]]; then
+	PART_PREFIX="${DRIVE}p"
+else
+	PART_PREFIX="${DRIVE}"
+fi
+
+parted -s ${DRIVE} mklabel msdos
+parted -s -a optimal ${DRIVE} mkpart primary ext4 0% 256MiB
+parted -s -a optimal ${DRIVE} mkpart primary btrfs 256MiB 100%
+
+mkfs.ext4 -F -L BOOT ${PART_PREFIX}1
+mkfs.btrfs -f ${PART_PREFIX}2
 
 mkdir /btrfs
-mount -o compress=zstd /dev/sda2 /btrfs
+mount -o compress=zstd ${PART_PREFIX}2 /btrfs
 btrfs subvolume create /btrfs/root
 umount /btrfs
 
-mount -o compress=zstd,subvol=/root /dev/sda2 /mnt
+mount -o compress=zstd,subvol=/root ${PART_PREFIX}2 /mnt
 mkdir /mnt/boot
-mount /dev/sda1 /mnt/boot
+mount ${PART_PREFIX}1 /mnt/boot
 
 rc-service ntpd start
 
 basestrap /mnt base base-devel openrc elogind-openrc vim man ntp ntp-openrc git
 basestrap /mnt linux linux-firmware
 
-artix-chroot /mnt bash -c 'curl -fsSL https://raw.githubusercontent.com/HimbeerserverDE/artixinstall/main/mkartix | bash'
+artix-chroot /mnt bash -c "curl -fsSL https://raw.githubusercontent.com/HimbeerserverDE/artixinstall/main/mkartix | sh -s -- ${DRIVE} ${PART_PREFIX}"
 
 fstabgen -U /mnt >> /mnt/etc/fstab
 

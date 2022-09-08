@@ -1,5 +1,13 @@
 #! /bin/bash -e
 
+DRIVE=$1
+PART_PREFIX=$2
+
+if [[ -z "${DRIVE}" ]] | [[ -z "${PART_PREFIX}" ]]; then
+	echo -e "\e[1m\e[1;31mUsage: mkartix <drive> <partition prefix>\e[0m"
+	exit 1
+fi
+
 ln -sf /usr/share/zoneinfo/Europe/Berlin /etc/localtime
 hwclock --systohc
 
@@ -12,7 +20,7 @@ export LC_COLLATE="C"
 EOT
 
 pacman -S --needed --noconfirm btrfs-progs grub os-prober
-grub-install --recheck /dev/sda
+grub-install --recheck ${DRIVE}
 grub-mkconfig -o /boot/grub/grub.cfg
 
 echo -en 'artix\nartix' | passwd
