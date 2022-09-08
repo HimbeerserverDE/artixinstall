@@ -1,6 +1,4 @@
-#! /bin/bash
-
-set -e
+#! /bin/bash -e
 
 ln -sf /usr/share/zoneinfo/Europe/Berlin /etc/localtime
 hwclock --systohc

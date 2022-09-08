@@ -1,6 +1,4 @@
-#! /bin/bash
-
-set -e
+#! /bin/bash -e
 
 if [ "${UID}" != "0" ]; then
 	echo "artixinstall: requires root permissions"
