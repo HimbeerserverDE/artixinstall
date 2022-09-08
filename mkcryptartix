@@ -12,9 +12,10 @@ KEYMAP=$(get_cmdline keytable)
 
 DRIVE=$1
 PART_PREFIX=$2
+TARGET=$3
 
-if [[ -z "${DRIVE}" ]] | [[ -z "${PART_PREFIX}" ]]; then
-	echo -e "\e[1m\e[1;31mUsage: mkcryptartix <drive> <partition prefix>\e[0m"
+if [[ -z "${DRIVE}" ]] | [[ -z "${PART_PREFIX}" ]] | [[ -z "${TARGET" ]]; then
+	echo -e "\e[1m\e[1;31mUsage: mkcryptartix <drive> <partition prefix> <target>\e[0m"
 	exit 1
 fi
 
@@ -59,7 +60,7 @@ echo "artix" | cryptsetup -q luksAddKey ${PART_PREFIX}2 /crypto_keyfile.bin
 
 sed -i "s/FILES=()/FILES=(\/crypto_keyfile.bin)/" /etc/mkinitcpio.conf
 
-grub-install --recheck ${DRIVE}
+grub-install --recheck --target=${TARGET} ${DRIVE}
 grub-mkconfig -o /boot/grub/grub.cfg
 
 mkinitcpio -p linux
@@ -99,8 +100,8 @@ cp -p /tmp/ckbcomp-bin/pkg/ckbcomp-bin/usr/bin/ckbcomp /usr/local/bin/ckbcomp
 grub-kbdcomp -o /boot/grub/keymap.gkb ${KEYMAP}
 (cd /boot/grub && tar cf memdisk.tar keymap.gkb)
 
-grub-mkimage -p /boot/grub -c /boot/grub/grub-pre.cfg -o /boot/grub/i386-pc/core.img -O i386-pc -m /boot/grub/memdisk.tar disk biosdisk diskfilter luks2 part_msdos cryptodisk gcry_rijndael pbkdf2 gcry_sha256 ext2 memdisk tar at_keyboard keylayouts terminal
-grub-bios-setup -d /boot/grub/i386-pc ${DRIVE}
+grub-mkimage -p /boot/grub -c /boot/grub/grub-pre.cfg -o /boot/grub/${TARGET}/core.img -O ${TARGET} -m /boot/grub/memdisk.tar disk biosdisk diskfilter luks2 part_msdos cryptodisk gcry_rijndael pbkdf2 gcry_sha256 ext2 memdisk tar at_keyboard keylayouts terminal
+grub-bios-setup -d /boot/grub/${TARGET} ${DRIVE}
 
 pacman -Rns --noconfirm libxkbcommon-x11 # Not needed by all users
 

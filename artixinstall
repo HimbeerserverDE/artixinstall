@@ -15,6 +15,7 @@ pacman -S --needed --noconfirm parted fzf
 #
 
 DRIVE=$1
+TARGET=$2
 
 if [ -z "${DRIVE}" ]; then
 	DRIVE="/dev/$(lsblk | grep disk | fzf --disabled | awk '{print $1}')"
@@ -24,6 +25,18 @@ if [[ "${DRIVE}" == "/dev/mmcblk"* ]] | [[ "${DRIVE}" == "/dev/nvme"* ]]; then
 	PART_PREFIX="${DRIVE}p"
 else
 	PART_PREFIX="${DRIVE}"
+fi
+
+if [ -z "${TARGET}" ]; then
+	echo -en "\e[1m\e[1;33mEnter GRUB target (commonly i386-pc): "
+	read TARGET
+
+	echo -e "\e[0m"
+fi
+
+if [ -z "${TARGET}" ]; then
+	echo -en "\e[1m\e[1;31mGRUB target must not be empty.\e[0m"
+	exit 1
 fi
 
 parted -s ${DRIVE} mklabel msdos
@@ -47,7 +60,7 @@ rc-service ntpd start
 basestrap /mnt base base-devel openrc elogind-openrc vim man ntp ntp-openrc git
 basestrap /mnt linux linux-firmware
 
-artix-chroot /mnt bash -c "curl -fsSL https://raw.githubusercontent.com/HimbeerserverDE/artixinstall/main/mkartix | sh -s -- ${DRIVE} ${PART_PREFIX}"
+artix-chroot /mnt bash -c "curl -fsSL https://raw.githubusercontent.com/HimbeerserverDE/artixinstall/main/mkartix | sh -s -- ${DRIVE} ${PART_PREFIX} ${TARGET}"
 
 fstabgen -U /mnt >> /mnt/etc/fstab
 
