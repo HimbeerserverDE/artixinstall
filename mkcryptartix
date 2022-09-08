@@ -115,16 +115,6 @@ EOT
 
 sed -i 's/hostname="localhost"/hostname="artix"/' /etc/conf.d/hostname
 
-pacman -S --needed --noconfirm dhclient
-
-cat <<EOT >> /etc/conf.d/net
-
-config_eth0="dhcp"
-EOT
-
-ln -s /etc/init.d/net.lo /etc/init.d/net.eth0
-rc-update add net.eth0 default
-
 sed -i 's/keymap="us"/keymap="de"/' /etc/conf.d/keymaps
 
 # Repositories
