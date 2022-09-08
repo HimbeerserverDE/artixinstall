@@ -16,4 +16,4 @@ Fully automated Artix Linux installer for my testing setup
 ## Automated install
 This method works for all installation methods mentioned above.
 
-`curl -fsSL https://raw.githubusercontent.com/HimbeerserverDE/artixinstall/main/<artix | crypt>install | sh -s -- <drive>`
+`curl -fsSL https://raw.githubusercontent.com/HimbeerserverDE/artixinstall/main/<artix | crypt>install | sh -s -- [drive [grubtarget]]`
