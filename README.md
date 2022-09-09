@@ -1,5 +1,5 @@
 # artixinstall
-Fully automated Artix Linux installer for my testing setup
+Fully automated Artix Linux installer for my testing setup.
 
 # Usage
 1. Boot the Artix Installer.
