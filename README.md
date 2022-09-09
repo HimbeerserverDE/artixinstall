@@ -1,5 +1,6 @@
 # artixinstall
 Fully automated Artix Linux installer for my testing setup.
+Only supports en_US language but any timezone and keymap.
 
 # Usage
 1. Boot the Artix Installer.
