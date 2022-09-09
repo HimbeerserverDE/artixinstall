@@ -2,7 +2,7 @@
 Fully automated Artix Linux installer for my testing setup
 
 # Usage
-1. Boot the Artix Installer (`keytable=de`).
+1. Boot the Artix Installer.
 2. Log in as `root`. The password is `artix`.
 3. Use one of the methods listed below.
 4. Once you get a green success message, reboot.
