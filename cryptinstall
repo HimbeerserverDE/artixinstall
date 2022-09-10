@@ -27,9 +27,6 @@ else
 	PART_PREFIX="${DRIVE}"
 fi
 
-# Needed so the GRUB prompt will work
-sleep 1
-
 if [ -z "${TARGET}" ]; then
     echo -en "\e[1m\e[1;33mEnter GRUB target (commonly i386-pc): "
     read TARGET
