@@ -37,7 +37,7 @@ fi
 # Needed because otherwise the disk might be overwritten
 # without installing a bootable system.
 if [ -z "${TARGET}" ]; then
-	echo -en "\e[1m\e[1;31mGRUB target must not be empty.\e[0m"
+	echo -e "\e[1m\e[1;31mGRUB target must not be empty.\e[0m"
 	exit 1
 fi
 
