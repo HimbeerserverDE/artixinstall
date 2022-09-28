@@ -30,11 +30,15 @@ export LANG="en_US.UTF-8"
 export LC_COLLATE="C"
 EOT
 
+sed -i "s/keymap=\"us\"/keymap=\"${KEYMAP}\"/" /etc/conf.d/keymaps
+
 pacman -S --needed --noconfirm btrfs-progs grub os-prober
 grub-install --recheck --target=${TARGET} ${DRIVE}
 grub-mkconfig -o /boot/grub/grub.cfg
 
 echo -en 'artix\nartix' | passwd
+
+# Network
 
 echo artix > /etc/hostname
 
@@ -52,8 +56,6 @@ ff02::2	ip6-allrouters
 EOT
 
 sed -i 's/hostname="localhost"/hostname="artix"/' /etc/conf.d/hostname
-
-sed -i "s/keymap=\"us\"/keymap=\"${KEYMAP}\"/" /etc/conf.d/keymaps
 
 # Repositories
 ## Artix
