@@ -70,5 +70,5 @@ umount -R /mnt
 
 echo -e "\n\e[1m\e[1;32mArtix has been successfully installed! It is now safe to reboot."
 echo -e "\e[1m\e[1;32mDon't forget to change the root password and hostname."
-echo -e "\e[1m\e[1;32mSetting up networking is left to you."
+echo -e "\e[1m\e[1;32mSetting up networking is left to you, dhcpcd is installed."
 echo -en "\e[0m"

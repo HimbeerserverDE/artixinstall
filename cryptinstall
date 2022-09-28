@@ -87,7 +87,7 @@ cryptsetup -q close root_crypt
 
 echo -e "\n\e[1m\e[1;32mArtix has been successfully installed! It is now safe to reboot."
 echo -e "\e[1m\e[1;32mDon't forget to change the root password, disk passwords and hostname."
-echo -e "\e[1m\e[1;32mSetting up networking is left to you."
+echo -e "\e[1m\e[1;32mSetting up networking is left to you, dhcpcd is installed."
 echo -e "\n\e[1m\e[1;32mRun the following commands to change the disk passwords:"
 echo -e "\e[1m\e[1;32m\t# cryptsetup --pbkdf pbkdf2 luksChangeKey ${PART_PREFIX}1"
 echo -e "\e[1m\e[1;32m\t# cryptsetup luksChangeKey ${PART_PREFIX}2"
