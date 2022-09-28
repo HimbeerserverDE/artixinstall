@@ -39,7 +39,7 @@ grub-mkconfig -o /boot/grub/grub.cfg
 echo -en 'artix\nartix' | passwd
 
 # Network
-
+## Hostname
 echo artix > /etc/hostname
 
 cat <<EOT > /etc/hosts

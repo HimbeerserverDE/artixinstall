@@ -110,7 +110,7 @@ pacman -Rns --noconfirm libxkbcommon-x11 # Not needed by all users
 echo -en 'artix\nartix' | passwd
 
 # Network
-
+## Hostname
 echo artix > /etc/hostname
 
 cat <<EOT > /etc/hosts
