@@ -128,6 +128,9 @@ EOT
 
 sed -i 's/hostname="localhost"/hostname="artix"/' /etc/conf.d/hostname
 
+## Networking essentials
+pacman -S --noconfirm dhcpcd
+
 # Repositories
 ## Artix
 cat <<EOT >> /etc/pacman.conf
