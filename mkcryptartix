@@ -66,6 +66,20 @@ grub-mkconfig -o /boot/grub/grub.cfg
 
 mkinitcpio -p linux
 
+# Enable GRUB to unlock /boot
+CRYPTO_UUID=$(blkid -s UUID -o value ${PART_PREFIX}1 | tr -d -)
+cat <<EOT > /boot/grub/grub-pre.cfg
+set crypto_uuid=${CRYPTO_UUID}
+cryptomount -u \$crypto_uuid
+set root=crypto0
+set prefix=(\$root)/grub
+insmod normal
+normal
+EOT
+
+grub-mkimage -p /boot/grub -c /boot/grub/grub-pre.cfg -o /boot/grub/${TARGET}/core.img -O ${TARGET} -m /boot/grub/memdisk.tar disk biosdisk diskfilter luks2 part_msdos cryptodisk gcry_rijndael pbkdf2 gcry_sha256 ext2
+grub-bios-setup -d /boot/grub/${TARGET} ${DRIVE}
+
 echo -en 'artix\nartix' | passwd
 
 # Network
