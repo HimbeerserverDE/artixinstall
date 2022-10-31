@@ -102,7 +102,7 @@ EOT
 sed -i 's/hostname="localhost"/hostname="artix"/' /etc/conf.d/hostname
 
 ## Networking essentials
-pacman -S --noconfirm dhcpcd
+pacman -S --noconfirm dhcpcd wpa_supplicant
 
 # Repositories
 ## Artix
