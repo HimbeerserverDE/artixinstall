@@ -32,7 +32,7 @@ EOT
 
 sed -i "s/keymap=\"us\"/keymap=\"${KEYMAP}\"/" /etc/conf.d/keymaps
 
-sed -i "s/HOOKS=(base udev autodetect modconf block filesystems keyboard fsck)/HOOKS=(base udev autodetect modconf block keyboard keymap encrypt filesystems fsck)/" /etc/mkinitcpio.conf
+sed -i "s/HOOKS=(base udev autodetect modconf kms keyboard keymap block filesystems fsck)/HOOKS=(base udev autodetect modconf kms keyboard keymap block encrypt filesystems fsck)/" /etc/mkinitcpio.conf
 
 pacman -S --needed --noconfirm btrfs-progs grub os-prober device-mapper-openrc cryptsetup-openrc
 
