@@ -29,7 +29,7 @@ fi
 
 if [ -z "${TARGET}" ]; then
 	echo -en "\e[1m\e[1;33mEnter GRUB target (commonly i386-pc): "
-	read TARGET
+	TARGET="$(echo | fzf --disabled --print-query)"
 
 	echo -e "\e[0m"
 fi
