@@ -28,8 +28,7 @@ else
 fi
 
 if [ -z "${TARGET}" ]; then
-	echo -en "\e[1m\e[1;33mEnter GRUB target (commonly i386-pc): "
-	TARGET="$(echo | fzf --disabled --print-query)"
+	TARGET=$(echo -en "\e[1m\e[1;33mEnter GRUB target (commonly i386-pc): " | fzf --disabled --print-query)
 
 	echo -e "\e[0m"
 fi
