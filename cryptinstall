@@ -29,8 +29,6 @@ fi
 
 if [ -z "${TARGET}" ]; then
     TARGET=$(echo "Enter GRUB target (commonly i386-pc): " | fzf --disabled --print-query)
-
-    echo -e "\e[0m"
 fi
 
 # Needed because otherwise the disk might be overwritten
