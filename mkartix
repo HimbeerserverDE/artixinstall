@@ -108,8 +108,6 @@ EOT
 pacman-key --populate archlinux
 pacman -Sy
 
-pacman -R --noconfirm sudo
-
 rc-update add ntpd default
 
 exit 0
