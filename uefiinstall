@@ -38,7 +38,7 @@ if [ -z "${TARGET}" ]; then
 	exit 1
 fi
 
-parted -s ${DRIVE} mklabel msdos
+parted -s ${DRIVE} mklabel gpt
 parted -s -a optimal ${DRIVE} mkpart primary fat32 0% 256MiB
 parted -s -a optimal ${DRIVE} mkpart primary ext4 256MiB 512MiB
 parted -s -a optimal ${DRIVE} mkpart primary btrfs 512MiB 100%
