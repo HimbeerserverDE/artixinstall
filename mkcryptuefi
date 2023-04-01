@@ -1,0 +1,159 @@
+#! /bin/bash
+
+set -e
+
+function get_cmdline {
+	sed -r 's/[[:alnum:]]+=/\n&/g' /proc/cmdline | awk -F= "\$1==\"$1\"{print \$2}" | sed 's/.\{1\}$//'
+}
+
+# cmdline options
+TIMEZONE=$(get_cmdline tz)
+KEYMAP=$(get_cmdline keytable)
+
+DRIVE=$1
+PART_PREFIX=$2
+TARGET=$3
+
+if [[ -z "${DRIVE}" ]] | [[ -z "${PART_PREFIX}" ]] | [[ -z "${TARGET}" ]]; then
+	echo -e "\e[1m\e[1;31mUsage: mkcryptuefi <drive> <partition prefix> <target>\e[0m"
+	exit 1
+fi
+
+ln -sf "/usr/share/zoneinfo/${TIMEZONE}" /etc/localtime
+hwclock --systohc
+
+sed -i "s/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/" /etc/locale.gen
+locale-gen
+
+cat <<EOT > /etc/locale.conf
+export LANG="en_US.UTF-8"
+export LC_COLLATE="C"
+EOT
+
+sed -i "s/keymap=\"us\"/keymap=\"${KEYMAP}\"/" /etc/conf.d/keymaps
+
+sed -i "s/HOOKS=(base udev autodetect modconf kms keyboard keymap consolefont block filesystems fsck)/HOOKS=(base udev autodetect modconf kms keyboard keymap consolefont block encrypt filesystems fsck)/" /etc/mkinitcpio.conf
+
+pacman -S --needed --noconfirm btrfs-progs grub os-prober efibootmgr device-mapper-openrc cryptsetup-openrc
+
+BOOT_UUID=$(blkid -s UUID -o value ${PART_PREFIX}2)
+
+dd bs=512 count=4 if=/dev/random of=/crypto_boot.bin iflag=fullblock
+chmod 600 /crypto_boot.bin
+echo "artix" | cryptsetup -q luksAddKey ${PART_PREFIX}2 /crypto_boot.bin
+
+cat <<EOT >> /etc/conf.d/dmcrypt
+
+target='boot_crypt'
+source='/dev/disk/by-uuid/${BOOT_UUID}'
+key='/crypto_boot.bin'
+EOT
+
+rc-update add dmcrypt boot
+
+UUID=$(blkid -s UUID -o value ${PART_PREFIX}3)
+sed -i "s/GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet\"/GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet cryptdevice=UUID=${UUID}:root_crypt\"/" /etc/default/grub
+sed -i "s/#GRUB_ENABLE_CRYPTODISK=y/GRUB_ENABLE_CRYPTODISK=y/" /etc/default/grub
+
+dd bs=512 count=4 if=/dev/random of=/crypto_keyfile.bin iflag=fullblock
+chmod 600 /crypto_keyfile.bin
+echo "artix" | cryptsetup -q luksAddKey ${PART_PREFIX}3 /crypto_keyfile.bin
+
+sed -i "s/FILES=()/FILES=(\/crypto_keyfile.bin)/" /etc/mkinitcpio.conf
+
+grub-install --target=${TARGET} --efi-directory=/boot/efi --bootloader-id=grub
+grub-mkconfig -o /boot/grub/grub.cfg
+
+mkinitcpio -p linux
+
+# Enable GRUB to unlock /boot
+CRYPTO_UUID=$(blkid -s UUID -o value ${PART_PREFIX}2 | tr -d -)
+cat <<EOT > /boot/grub/grub-pre.cfg
+set crypto_uuid=${CRYPTO_UUID}
+cryptomount -u \$crypto_uuid
+
+set root=crypto0
+set prefix=(\$root)/grub
+
+insmod normal
+normal
+EOT
+
+grub-mkimage -p /boot/grub -c /boot/grub/grub-pre.cfg -o /tmp/grubx64.efi -O ${TARGET} disk biosdisk diskfilter luks2 part_msdos cryptodisk gcry_rijndael pbkdf2 gcry_sha256 ext2
+install -v /tmp/grubx64.efi /boot/efi/EFI/GRUB/grubx64.efi
+
+echo -en 'artix\nartix' | passwd
+
+# Network
+## Hostname
+echo artix > /etc/hostname
+
+cat <<EOT > /etc/hosts
+# Static table lookup for hostnames.
+# See hosts(5) for details.
+
+127.0.0.1	localhost
+127.0.1.1	artix.local	artix
+
+# IPv6
+::1		localhost	ip6-localhost	ip6-loopback
+ff02::1	ip6-allnodes
+ff02::2	ip6-allrouters
+EOT
+
+sed -i 's/hostname="localhost"/hostname="artix"/' /etc/conf.d/hostname
+
+## Networking essentials
+pacman -S --noconfirm dhcpcd wpa_supplicant
+
+# Repositories
+## Artix
+cat <<EOT >> /etc/pacman.conf
+
+#
+# Custom
+#
+
+# Artix
+
+[universe]
+Server = https://universe.artixlinux.org/\$arch
+Server = https://mirror1.artixlinux.org/universe/\$arch
+Server = https://mirror.pascalpuffke.de/artix-universe/\$arch
+Server = https://artixlinux.qontinuum.space/artixlinux/universe/os/\$arch
+Server = https://mirror1.cl.netactuate.com/artix/universe/\$arch
+Server = https://ftp.crifo.org/artix-universe/
+EOT
+
+## Arch
+pacman -Sy --needed --noconfirm artix-archlinux-support
+
+cat <<EOT >> /etc/pacman.conf
+
+# Arch
+
+#[testing]
+#Include = /etc/pacman.d/mirrorlist-arch
+
+[extra]
+Include = /etc/pacman.d/mirrorlist-arch
+
+#[community-testing]
+#Include = /etc/pacman.d/mirrorlist-arch
+
+[community]
+Include = /etc/pacman.d/mirrorlist-arch
+
+#[multilib-testing]
+#Include = /etc/pacman.d/mirrorlist-arch
+
+#[multilib]
+#Include = /etc/pacman.d/mirrorlist-arch
+EOT
+
+pacman-key --populate archlinux
+pacman -Sy
+
+rc-update add ntpd default
+
+exit 0

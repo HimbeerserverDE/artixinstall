@@ -1,0 +1,96 @@
+#! /bin/bash
+
+set -e
+
+if [ "${UID}" != "0" ]; then
+	echo "cryptuefiinstall: requires root permissions"
+	exit 1
+fi
+
+pacman -Sy
+pacman -S --needed --noconfirm parted fzf
+
+#
+# Config questions
+#
+
+DRIVE=$1
+TARGET=$2
+
+if [ -z "${DRIVE}" ]; then
+	DRIVE="/dev/$(lsblk | grep disk | fzf --disabled | awk '{print $1}')"
+fi
+
+if [[ "${DRIVE}" == "/dev/mmcblk"* ]] | [[ "${DRIVE}" == "/dev/nvme"* ]]; then
+	PART_PREFIX="${DRIVE}p"
+else
+	PART_PREFIX="${DRIVE}"
+fi
+
+if [ -z "${TARGET}" ]; then
+    TARGET=$(echo "Enter GRUB target (commonly x86_64-efi): " | fzf --disabled --print-query | sed -n '1 p')
+fi
+
+# Needed because otherwise the disk might be overwritten
+# without installing a bootable system.
+if [ -z "${TARGET}" ]; then
+    echo -en "\e[1m\e[1;31mGRUB target must not be empty.\e[0m"
+    exit 1
+fi
+
+#
+# Full Disk Encryption
+#
+
+parted -s ${DRIVE} mklabel gpt
+parted -s -a optimal ${DRIVE} mkpart primary fat32 0% 256MiB
+parted -s -a optimal ${DRIVE} mkpart primary ext4 256MiB 512MiB
+parted -s -a optimal ${DRIVE} mkpart primary ext4 512MiB 100%
+
+echo "artix" | cryptsetup -q --pbkdf pbkdf2 luksFormat ${PART_PREFIX}2
+echo "artix" | cryptsetup -q open ${PART_PREFIX}2 boot_crypt
+
+echo "artix" | cryptsetup -q luksFormat ${PART_PREFIX}3
+echo "artix" | cryptsetup -q open ${PART_PREFIX}3 root_crypt
+
+mkfs.fat -F 32 ${PART_PREFIX}1 && fatlabel ${PART_PREFIX}1 ESP
+mkfs.ext4 -F -L BOOT /dev/mapper/boot_crypt
+mkfs.btrfs -f /dev/mapper/root_crypt
+
+mkdir /btrfs
+mount -o compress=zstd /dev/mapper/root_crypt /btrfs
+btrfs subvolume create /btrfs/root
+umount /btrfs
+
+mount -o compress=zstd,subvol=/root /dev/mapper/root_crypt /mnt
+mkdir /mnt/boot
+mount /dev/mapper/boot_crypt /mnt/boot
+mkdir /mnt/boot/efi
+mount ${PART_PREFIX}1 /mnt/boot/efi
+
+#
+# Continue Installation
+#
+
+rc-service ntpd start
+
+basestrap /mnt base openrc elogind-openrc vim man ntp-openrc git
+basestrap /mnt linux linux-firmware
+
+artix-chroot /mnt bash -c "curl -fsSL https://raw.githubusercontent.com/HimbeerserverDE/artixinstall/main/mkcryptuefi | sh -s -- ${DRIVE} ${PART_PREFIX} ${TARGET}"
+
+fstabgen -U /mnt >> /mnt/etc/fstab
+
+umount -R /mnt
+
+cryptsetup -q close boot_crypt
+cryptsetup -q close root_crypt
+
+echo -e "\n\e[1m\e[1;32mArtix has been successfully installed! It is now safe to reboot."
+echo -e "\e[1m\e[1;32mDon't forget to change the root password, disk passwords and hostname."
+echo -e "\e[1m\e[1;32mSetting up networking is left to you, dhcpcd and wpa_supplicant are installed."
+echo -e "\n\e[1m\e[1;32mRun the following commands to change the disk passwords:"
+echo -e "\e[1m\e[1;32m\t# cryptsetup --pbkdf pbkdf2 luksChangeKey ${PART_PREFIX}2"
+echo -e "\e[1m\e[1;32m\t# cryptsetup luksChangeKey ${PART_PREFIX}3"
+echo -e "\n\e[1m\e[1;32mChoose US compatible passwords as GRUB uses the US keyboard layout."
+echo -en "\e[0m"
