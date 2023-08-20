@@ -124,4 +124,6 @@ pacman -S --needed --noconfirm raspberrypi-bootloader
 
 rc-update add ntpd default
 
+fstabgen -U / >> /etc/fstab
+
 exit 0

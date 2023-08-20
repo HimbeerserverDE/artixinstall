@@ -57,16 +57,13 @@ mount ${PART_PREFIX}1 /mnt/boot
 
 (cd /mnt && tar -xJf ${IMG})
 
-artix-chroot /mnt bash -c "curl -fsSL https://raw.githubusercontent.com/HimbeerserverDE/artixinstall/main/mkarmtix | sh -s -- ${DRIVE} ${PART_PREFIX}"
-
-fstabgen -U /mnt >> /mnt/etc/fstab
-
 umount -R /mnt
 sync
 
 rm -d /btrfs
 
 echo -e "\n\e[1m\e[1;32mArmtix has been successfully installed! It is now safe to remove the drive."
+echo -e "\e[1m\e[1;32mYou will have to complete the installation using mkarmtix."
 echo -e "\e[1m\e[1;32mDon't forget to change the root password and hostname."
 echo -e "\e[1m\e[1;32mYou should synchronize the system clock to hardware yourself."
 echo -e "\e[1m\e[1;32mSetting up networking is left to you, dhcpcd and wpa_supplicant are installed."
