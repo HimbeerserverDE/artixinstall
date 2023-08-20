@@ -2,13 +2,20 @@
 
 set -e
 
-function get_cmdline {
-	sed -r 's/[[:alnum:]]+=/\n&/g' /proc/cmdline | awk -F= "\$1==\"$1\"{print \$2}" | sed 's/.\{1\}$//'
-}
+#
+# Config questions
+#
 
-# cmdline options
-TIMEZONE=$(get_cmdline tz)
-KEYMAP=$(get_cmdline keytable)
+TIMEZONE=$1
+KEYMAP=$2
+
+if [ -z "${TIMEZONE}" ]; then
+	TIMEZONE=$(find /usr/share/zoneinfo | fzf)
+fi
+
+if [ -z "${KEYMAP}" ]; then
+	KEYMAP=$(echo "Enter keymap (e.g. us, de): " | fzf --disabled --print-query | sed -n '1 p')
+fi
 
 pacman -Syu --noconfirm
 
