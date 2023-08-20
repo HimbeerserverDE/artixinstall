@@ -48,7 +48,7 @@ EOT
 sed -i 's/hostname="localhost"/hostname="armtix"/' /etc/conf.d/hostname
 
 ## Networking essentials
-pacman -Sy --noconfirm dhcpcd wpa_supplicant
+pacman -Sy --needed --noconfirm dhcpcd wpa_supplicant
 
 # Repositories
 ## Artix
