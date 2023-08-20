@@ -24,7 +24,7 @@ EOT
 
 sed -i "s/keymap=\"us\"/keymap=\"${KEYMAP}\"/" /etc/conf.d/keymaps
 
-pacman -S -needed --noconfirm btrfs-progs
+pacman -S --needed --noconfirm btrfs-progs
 
 mkinitcpio -p linux-aarch64
 
