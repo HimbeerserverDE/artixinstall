@@ -113,9 +113,9 @@ pacman -Rns --noconfirm sudo
 rc-update del dhcpcd default
 pacman -R --noconfirm dhcpcd-openrc
 
-echo -e "\n\e[1m\e[1;32mArmtix has been successfully configured! It MAY NOT be safe to reboot."
+echo -e "\n\e[1m\e[1;32mArmtix has been successfully configured! It MAY NOT be safe to reboot or close this shell session."
 echo -e "\e[1m\e[1;32mDon't forget to change the root password and hostname, and to add a regular user for SSH."
 echo -e "\e[1m\e[1;32mSetting up networking is left to you, dhcpcd and wpa_supplicant are installed."
 echo -e "\e[1m\e[1;32mYou may want to uninstall the SSH server depending on your use case."
-echo -e "\e[1m\e[1;32mRebooting now will cause SSH to become inaccessible due to disallowed root login and the lack of network configuration."
+echo -e "\e[1m\e[1;32mRebooting or disconnecting now will cause SSH to become inaccessible due to disallowed root login and the lack of network configuration."
 echo -en "\e[0m"
