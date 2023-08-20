@@ -16,6 +16,8 @@ pacman -S --needed --noconfirm parted fzf artools-base
 
 DRIVE=$1
 IMG=$2
+BOOTLOADER=$3
+FIRMWARE=$4
 
 if [ -z "${DRIVE}" ]; then
 	DRIVE="/dev/$(lsblk | grep disk | fzf --disabled | awk '{print $1}')"
@@ -34,6 +36,26 @@ fi
 # Needed because otherwise there is no system to operate on.
 if [ -z "${IMG}" ]; then
 	echo -e "\e[1m\e[1;31mImage path must not be empty.\e[0m"
+	exit 1
+fi
+
+if [ -z "${BOOTLOADER}" ]; then
+	BOOTLOADER=$(echo "Enter bootloader path (download from archlinuxarm.org): " | fzf --disabled --print-query | sed -n '1 p')
+fi
+
+# Needed because otherwise the Raspberry Pi won't boot.
+if [ -z "${BOOTLOADER}" ]; then
+	echo -e "\e[1m\e[1;31mBootloader path must not be empty.\e[0m"
+	exit 1
+fi
+
+if [ -z "${FIRMWARE}" ]; then
+	FIRMWARE=$(echo "Enter firmware path (download from archlinuxarm.org): " | fzf --disabled --print-query | sed -n '1 p')
+fi
+
+# Needed because otherwise the Raspberry Pi won't boot.
+if [ -z "${FIRMWARE}" ]; then
+	echo -e "\e[1m\e[1;31mFirmware path must not be empty.\e[0m"
 	exit 1
 fi
 
