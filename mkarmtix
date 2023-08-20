@@ -32,6 +32,18 @@ sed -i "s/keymap=\"us\"/keymap=\"${KEYMAP}\"/" /etc/conf.d/keymaps
 
 pacman -S -needed --noconfirm btrfs-progs
 
+UUID=$(blkid -s UUID -o value ${PART_PREFIX}2)
+
+cat <<EOT > /boot/config.txt
+enable_uart=1
+arm_64bit=1
+kernel=/Image
+initramfs /initramfs-linux.img followkernel
+device-tree=/dtbs/broadcom/bcm2711-rpi-4-b.dtb
+EOT
+
+echo "console=ttyS1,115200 earlyprintk=serial,ttyS1,115200 kgdboc=ttyS1,115200 root=UUID=${UUID} ro rootflags=subvol=root rootwait smsc95xx.turbo_mode=N dwc_otg.lpm_enable=0" > /boot/cmdline.txt
+
 sed -i "s/MODULES=()/MODULES=(pcie_brcmstb)/" /etc/mkinitcpio.conf
 
 echo -en 'armtix\narmtix' | passwd
@@ -107,6 +119,8 @@ EOT
 
 pacman-key --populate archlinux
 pacman -Sy
+
+pacman -S --needed --noconfirm raspberrypi-bootloader
 
 rc-update add ntpd default
 
