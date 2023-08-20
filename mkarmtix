@@ -24,7 +24,7 @@ EOT
 
 sed -i "s/keymap=\"us\"/keymap=\"${KEYMAP}\"/" /etc/conf.d/keymaps
 
-pacman -S --needed --noconfirm btrfs-progs
+pacman -Sy --needed --noconfirm btrfs-progs
 
 mkinitcpio -p linux-aarch64
 
@@ -48,7 +48,7 @@ EOT
 sed -i 's/hostname="localhost"/hostname="armtix"/' /etc/conf.d/hostname
 
 ## Networking essentials
-pacman -S --noconfirm dhcpcd wpa_supplicant
+pacman -Sy --noconfirm dhcpcd wpa_supplicant
 
 # Repositories
 ## Artix
@@ -100,7 +100,7 @@ pacman -Sy
 
 hwclock --systohc
 
-pacman -S --needed --noconfirm raspberrypi-bootloader raspberrypi-firmware
+pacman -Sy --needed --noconfirm raspberrypi-bootloader raspberrypi-firmware
 
 rc-update add ntpd default
 
