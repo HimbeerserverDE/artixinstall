@@ -28,8 +28,6 @@ sed -i "s/keymap=\"us\"/keymap=\"${KEYMAP}\"/" /etc/conf.d/keymaps
 
 pacman -Sy --needed --noconfirm btrfs-progs
 
-mkinitcpio -p linux-aarch64
-
 # Network
 ## Hostname
 echo armtix > /etc/hostname
