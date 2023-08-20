@@ -10,13 +10,7 @@ function get_cmdline {
 TIMEZONE=$(get_cmdline tz)
 KEYMAP=$(get_cmdline keytable)
 
-DRIVE=$1
-PART_PREFIX=$2
-
-if [[ -z "${DRIVE}" ]] | [[ -z "${PART_PREFIX}" ]]; then
-	echo -e "\e[1m\e[1;31mUsage: mkarmtix <drive> <partition prefix>\e[0m"
-	exit 1
-fi
+rc-service ntpd start
 
 ln -sf "/usr/share/zoneinfo/${TIMEZONE}" /etc/localtime
 
@@ -33,10 +27,6 @@ sed -i "s/keymap=\"us\"/keymap=\"${KEYMAP}\"/" /etc/conf.d/keymaps
 pacman -S -needed --noconfirm btrfs-progs
 
 mkinitcpio -p linux-aarch64
-
-echo -en 'armtix\narmtix' | passwd
-userdel -r armtix
-pacman -Rns --noconfirm sudo
 
 # Network
 ## Hostname
@@ -108,10 +98,28 @@ EOT
 pacman-key --populate archlinux
 pacman -Sy
 
-pacman -S --needed --noconfirm raspberrypi-bootloader
+hwclock --systohc
+
+pacman -S --needed --noconfirm raspberrypi-bootloader raspberrypi-firmware
 
 rc-update add ntpd default
 
 fstabgen -U / >> /etc/fstab
 
-exit 0
+#
+# Configuration
+#
+
+echo -en 'armtix\narmtix' | passwd
+userdel -r armtix
+
+pacman -Rns --noconfirm sudo
+
+rc-update del dhcpcd default
+pacman -R --noconfirm dhcpcd-openrc
+
+echo -e "\n\e[1m\e[1;32mArmtix has been successfully configured! It is NOT safe to reboot."
+echo -e "\e[1m\e[1;32mDon't forget to change the root password and hostname, and to add a regular user for SSH."
+echo -e "\e[1m\e[1;32mSetting up networking is left to you, dhcpcd and wpa_supplicant are installed."
+echo -e "\e[1m\e[1;32mRebooting now will cause the device to become inaccessible due to disallowed SSH root login and the lack of network configuration."
+echo -en "\e[0m"

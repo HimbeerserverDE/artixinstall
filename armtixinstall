@@ -100,7 +100,6 @@ rm -d /btrfs
 
 echo -e "\n\e[1m\e[1;32mArmtix has been successfully installed! It is now safe to remove the drive."
 echo -e "\e[1m\e[1;32mYou will have to complete the installation using mkarmtix."
-echo -e "\e[1m\e[1;32mDon't forget to change the root password and hostname."
-echo -e "\e[1m\e[1;32mYou should synchronize the system clock to hardware yourself."
-echo -e "\e[1m\e[1;32mSetting up networking is left to you, dhcpcd and wpa_supplicant are installed."
+echo -e "\e[1m\e[1;32mTo do this, connect via SSH as user 'armtix' (password is 'armtix')."
+echo -e "\e[1m\e[1;32mThe machine will connect to the network on eth0."
 echo -en "\e[0m"
