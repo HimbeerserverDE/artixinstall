@@ -56,7 +56,8 @@ mkdir /mnt/boot
 mount ${PART_PREFIX}1 /mnt/boot
 
 (cd /mnt && tar -xJf ${IMG})
-(cd /mnt && tar -xJf ${BOOTLOADER} && rm -f boot/.BUILDINFO boot/.MTREE boot/.PKGINFO)
+(cd /mnt && tar -xJf ${BOOTLOADER} && rm -f .BUILDINFO .MTREE .PKGINFO)
+(cd /mnt && tar -xJf ${FIRMWARE} && rm -f .BUILDINFO .MTREE .PKGINFO)
 
 umount -R /mnt
 sync
