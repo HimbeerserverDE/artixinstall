@@ -1,0 +1,113 @@
+#! /bin/bash
+
+set -e
+
+function get_cmdline {
+	sed -r 's/[[:alnum:]]+=/\n&/g' /proc/cmdline | awk -F= "\$1==\"$1\"{print \$2}" | sed 's/.\{1\}$//'
+}
+
+# cmdline options
+TIMEZONE=$(get_cmdline tz)
+KEYMAP=$(get_cmdline keytable)
+
+DRIVE=$1
+PART_PREFIX=$2
+
+if [[ -z "${DRIVE}" ]] | [[ -z "${PART_PREFIX}" ]]; then
+	echo -e "\e[1m\e[1;31mUsage: mkarmtix <drive> <partition prefix>\e[0m"
+	exit 1
+fi
+
+ln -sf "/usr/share/zoneinfo/${TIMEZONE}" /etc/localtime
+
+sed -i "s/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/" /etc/locale.gen
+locale-gen
+
+cat <<EOT > /etc/locale.conf
+export LANG="en_US.UTF-8"
+export LC_COLLATE="C"
+EOT
+
+sed -i "s/keymap=\"us\"/keymap=\"${KEYMAP}\"/" /etc/conf.d/keymaps
+
+pacman -S -needed --noconfirm btrfs-progs
+
+sed -i "s/MODULES=()/MODULES=(pcie_brcmstb)/" /etc/mkinitcpio.conf
+
+echo -en 'armtix\narmtix' | passwd
+userdel -r armtix
+pacman -Rns --noconfirm sudo
+
+# Network
+## Hostname
+echo armtix > /etc/hostname
+
+cat <<EOT > /etc/hosts
+# Static table lookup for hostnames.
+# See hosts(5) for details.
+
+127.0.0.1	localhost
+127.0.1.1	armtix.local armtix
+
+# IPv6
+::1		localhost	ip6-localhost	ip6-loopback
+ff02::1	ip6-allnodes
+ff02::2	ip6-allrouters
+EOT
+
+sed -i 's/hostname="localhost"/hostname="armtix"/' /etc/conf.d/hostname
+
+## Networking essentials
+pacman -S --noconfirm dhcpcd wpa_supplicant
+
+# Repositories
+## Artix
+cat <<EOT >> /etc/pacman.conf
+
+#
+# Custom
+#
+
+# Artix
+
+[universe]
+Server = https://universe.artixlinux.org/\$arch
+Server = https://mirror1.artixlinux.org/universe/\$arch
+Server = https://mirror.pascalpuffke.de/artix-universe/\$arch
+Server = https://artixlinux.qontinuum.space/artixlinux/universe/os/\$arch
+Server = https://mirror1.cl.netactuate.com/artix/universe/\$arch
+Server = https://ftp.crifo.org/artix-universe/
+EOT
+
+## Arch
+pacman -Sy --needed --noconfirm artix-archlinux-support
+
+cat <<EOT >> /etc/pacman.conf
+
+# Arch
+
+#[testing]
+#Include = /etc/pacman.d/mirrorlist-arch
+
+[extra]
+Include = /etc/pacman.d/mirrorlist-arch
+
+#[community-testing]
+#Include = /etc/pacman.d/mirrorlist-arch
+
+[community]
+Include = /etc/pacman.d/mirrorlist-arch
+
+#[multilib-testing]
+#Include = /etc/pacman.d/mirrorlist-arch
+
+#[multilib]
+#Include = /etc/pacman.d/mirrorlist-arch
+EOT
+
+pacman-key --populate archlinux
+pacman -Sy
+
+rc-update add ntpd default
+
+exit 0

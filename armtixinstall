@@ -1,0 +1,73 @@
+#! /bin/bash
+
+set -e
+
+if [ "${UID}" != "0" ]; then
+	echo "armtixinstall: requires root permissions"
+	exit 1
+fi
+
+pacman -Sy
+pacman -S --needed --noconfirm parted fzf
+
+#
+# Config questions
+#
+
+DRIVE=$1
+IMG=$2
+
+if [ -z "${DRIVE}" ]; then
+	DRIVE="/dev/$(lsblk | grep disk | fzf --disabled | awk '{print $1}')"
+fi
+
+if [[ "${DRIVE}" == "/dev/mmcblk"* ]] | [[ "${DRIVE}" == "/dev/nvme"* ]]; then
+	PART_PREFIX="${DRIVE}p"
+else
+	PART_PREFIX="${DRIVE}"
+fi
+
+if [ -z "${IMG}" ]; then
+	IMG=$(echo "Enter image path (download from armtixlinux.org, OpenRC): " | fzf --disabled --print-query | sed -n '1 p')
+fi
+
+# Needed because otherwise there is no system to operate on.
+if [ -z "${IMG}" ]; then
+	echo -e "\e[1m\e[1;31mImage path must not be empty.\e[0m"
+	exit 1
+fi
+
+parted -s ${DRIVE} mklabel msdos
+parted -s -a optimal ${DRIVE} mkpart primary fat32 0% 256MiB
+parted -s -a optimal ${DRIVE} mkpart primary btrfs 256MiB 100%
+
+mkfs.fat -F 32 ${PART_PREFIX}1
+mkfs.btrfs -f ${PART_PREFIX}2
+
+fatlabel ${PART_PREFIX}1 BOOT
+
+mkdir /btrfs
+mount -o compress=zstd ${PART_PREFIX}2 /btrfs
+btrfs subvolume create /btrfs/root
+umount /btrfs
+
+mount -o compress=zstd,subvol=/root ${PART_PREFIX}2 /mnt
+mkdir /mnt/boot
+mount ${PART_PREFIX}1 /mnt/boot
+
+(cd /mnt && tar -xvJf ${IMG})
+
+artix-chroot /mnt bash -c "curl -fsSL https://raw.githubusercontent.com/HimbeerserverDE/artixinstall/main/mkarmtix | sh -s -- ${DRIVE} ${PART_PREFIX}"
+
+fstabgen -U /mnt >> /mnt/etc/fstab
+
+umount -R /mnt
+sync
+
+rm -d /btrfs
+
+echo -e "\n\e[1m\e[1;32mArmtix has been successfully installed! It is now safe to remove the drive."
+echo -e "\e[1m\e[1;32mDon't forget to change the root password and hostname."
+echo -e "\e[1m\e[1;32mYou should synchronize the system clock to hardware yourself."
+echo -e "\e[1m\e[1;32mSetting up networking is left to you, dhcpcd and wpa_supplicant are installed."
+echo -en "\e[0m"
