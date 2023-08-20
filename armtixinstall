@@ -55,7 +55,7 @@ mount -o compress=zstd,subvol=/root ${PART_PREFIX}2 /mnt
 mkdir /mnt/boot
 mount ${PART_PREFIX}1 /mnt/boot
 
-(cd /mnt && tar -xvJf ${IMG})
+(cd /mnt && tar -xJf ${IMG})
 
 artix-chroot /mnt bash -c "curl -fsSL https://raw.githubusercontent.com/HimbeerserverDE/artixinstall/main/mkarmtix | sh -s -- ${DRIVE} ${PART_PREFIX}"
 
