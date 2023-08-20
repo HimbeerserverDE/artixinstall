@@ -93,6 +93,8 @@ EOT
 
 echo "console=ttyS1,115200 earlyprintk=serial,ttyS1,115200 kgdboc=ttyS1,115200 root=UUID=${UUID} ro rootflags=subvol=root rootwait smsc95xx.turbo_mode=N dwc_otg.lpm_enable=0" > /mnt/boot/cmdline.txt
 
+fstabgen -U /mnt >> /mnt/etc/fstab
+
 umount -R /mnt
 sync
 
