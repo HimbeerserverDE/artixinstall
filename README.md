@@ -2,6 +2,7 @@
 
 Fully automated Artix Linux installer. Only supports en_US language
 but any timezone and keymap (derived from selection in the installer menu).
+Capable of encrypting installations and using the linux-hardened kernel.
 
 # Usage
 
