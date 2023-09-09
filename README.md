@@ -43,3 +43,23 @@ This method works for all installation methods mentioned above.
 ```
 curl -fsSL https://raw.githubusercontent.com/HimbeerserverDE/artixinstall/main/<artix | uefi | crypt | cryptuefi>install | sh -s -- [drive [grubtarget]]
 ```
+
+# Partition Layout
+
+## BIOS
+
+BIOS installations follow this disk layout:
+
+* /boot: ext4, 256 MiB
+* /: btrfs, 100% - 256 MiB, compress=zstd, subvol=/root
+
+If FDE is used both partitions are LUKS2 containers. The boot partition uses
+PBKDF2 as its key derivation function.
+
+## UEFI
+
+UEFI installations follow this disk layout:
+
+* /boot/efi: fat32, 256 MiB
+* /boot: ext4, 256 MiB
+* /: btrfs, 100% - 512 MiB, compress=zstd, subvol=/root
