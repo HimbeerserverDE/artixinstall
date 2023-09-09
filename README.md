@@ -1,7 +1,7 @@
 # artixinstall
 
-Fully automated Artix Linux installer for my testing setup.
-Only supports en_US language but any timezone and keymap.
+Fully automated Artix Linux installer. Only supports en_US language
+but any timezone and keymap (derived from selection in the installer menu).
 
 # Usage
 
