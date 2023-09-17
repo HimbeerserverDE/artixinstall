@@ -64,7 +64,7 @@ sed -i "s/FILES=()/FILES=(\/crypto_keyfile.bin)/" /etc/mkinitcpio.conf
 grub-install --recheck --target=${TARGET} ${DRIVE}
 grub-mkconfig -o /boot/grub/grub.cfg
 
-mkinitcpio -p linux
+mkinitcpio -p linux-hardened
 
 # Enable GRUB to unlock /boot
 CRYPTO_UUID=$(blkid -s UUID -o value ${PART_PREFIX}1 | tr -d -)
