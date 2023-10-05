@@ -31,7 +31,9 @@ curl -fsSL https://raw.githubusercontent.com/HimbeerserverDE/artixinstall/main/u
 
 ## FDE (Full Disk Encryption) Usage (UEFI / GPT)
 
-**WARNING: The EFI partition cannot be encrypted.**
+**WARNING: The EFI partition cannot be encrypted. This probably doesn't matter
+as long as nobody has physical access to the machine, but make sure
+not to store any information in /boot/efi by accident.**
 
 ```
 curl -fsSL https://raw.githubusercontent.com/HimbeerserverDE/artixinstall/main/cryptuefiinstall | sh
