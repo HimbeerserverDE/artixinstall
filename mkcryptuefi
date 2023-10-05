@@ -12,10 +12,9 @@ KEYMAP=$(get_cmdline keytable)
 
 DRIVE=$1
 PART_PREFIX=$2
-TARGET=$3
 
-if [[ -z "${DRIVE}" ]] | [[ -z "${PART_PREFIX}" ]] | [[ -z "${TARGET}" ]]; then
-	echo -e "\e[1m\e[1;31mUsage: mkcryptuefi <drive> <partition prefix> <target>\e[0m"
+if [[ -z "${DRIVE}" ]] | [[ -z "${PART_PREFIX}" ]]; then
+	echo -e "\e[1m\e[1;31mUsage: mkcryptuefi <drive> <partition prefix>\e[0m"
 	exit 1
 fi
 
@@ -34,53 +33,23 @@ sed -i "s/keymap=\"us\"/keymap=\"${KEYMAP}\"/" /etc/conf.d/keymaps
 
 sed -i "s/HOOKS=(base udev autodetect modconf kms keyboard keymap consolefont block filesystems fsck)/HOOKS=(base udev autodetect modconf kms keyboard keymap consolefont block encrypt filesystems fsck)/" /etc/mkinitcpio.conf
 
-pacman -S --needed --noconfirm btrfs-progs grub os-prober efibootmgr device-mapper-openrc cryptsetup-openrc
+pacman -S --needed --noconfirm btrfs-progs efibootmgr
 
-BOOT_UUID=$(blkid -s UUID -o value ${PART_PREFIX}2)
+UUID_CRYPT=$(blkid -s UUID -o value ${PART_PREFIX}2)
+UUID_INNER=$(blkid -s UUID -o value /dev/mapper/data_crypt)
 
-dd bs=512 count=4 if=/dev/random of=/crypto_boot.bin iflag=fullblock
-chmod 600 /crypto_boot.bin
-echo "artix" | cryptsetup -q luksAddKey ${PART_PREFIX}2 /crypto_boot.bin
+mkdir -p /etc/kernel
+echo "loglevel=3 quiet root=UUID=${UUID_INNER} ro rootflags=subvol=root cryptdevice=UUID=${UUID_CRYPT}:data_crypt" > /etc/kernel/cmdline
 
-cat <<EOT >> /etc/conf.d/dmcrypt
+sed -i 's/#default_uki="\\/efi\\/EFI\\/Linux\\/arch-linux-hardened\\.efi"/default_uki="/boot/efi/EFI/artix/artix-linux-hardened.efi"/' /etc/mkinitcpio.d/linux-hardened.preset
+sed -i 's/#fallback_uki="\\/efi\\/EFI\\/Linux\\/arch-linux-hardened\\.efi"/fallback_uki="/boot/efi/EFI/artix/artix-linux-hardened-fallback.efi"/' /etc/mkinitcpio.d/linux-hardened.preset
 
-target='boot_crypt'
-source='/dev/disk/by-uuid/${BOOT_UUID}'
-key='/crypto_boot.bin'
-EOT
-
-rc-update add dmcrypt boot
-
-UUID=$(blkid -s UUID -o value ${PART_PREFIX}3)
-sed -i "s/GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet\"/GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet cryptdevice=UUID=${UUID}:root_crypt\"/" /etc/default/grub
-sed -i "s/#GRUB_ENABLE_CRYPTODISK=y/GRUB_ENABLE_CRYPTODISK=y/" /etc/default/grub
-
-dd bs=512 count=4 if=/dev/random of=/crypto_keyfile.bin iflag=fullblock
-chmod 600 /crypto_keyfile.bin
-echo "artix" | cryptsetup -q luksAddKey ${PART_PREFIX}3 /crypto_keyfile.bin
-
-sed -i "s/FILES=()/FILES=(\/crypto_keyfile.bin)/" /etc/mkinitcpio.conf
-
-grub-install --target=${TARGET} --efi-directory=/boot/efi --bootloader-id=grub
-grub-mkconfig -o /boot/grub/grub.cfg
+mkdir -p /boot/efi/EFI/artix
 
 mkinitcpio -p linux-hardened
 
-# Enable GRUB to unlock /boot
-CRYPTO_UUID=$(blkid -s UUID -o value ${PART_PREFIX}2 | tr -d -)
-cat <<EOT > /boot/grub/grub-pre.cfg
-set crypto_uuid=${CRYPTO_UUID}
-cryptomount -u \$crypto_uuid
-
-set root=crypto0
-set prefix=(\$root)/grub
-
-insmod normal
-normal
-EOT
-
-grub-mkimage -p /boot/grub -c /boot/grub/grub-pre.cfg -o /tmp/grubx64.efi -O ${TARGET} disk diskfilter luks2 part_gpt cryptodisk gcry_rijndael pbkdf2 gcry_sha256 ext2
-install -v /tmp/grubx64.efi /boot/efi/EFI/GRUB/grubx64.efi
+efibootmgr --create --disk ${DRIVE} --part 1 --label "Artix Linux" --loader '\EFI\artix\artix-linux-hardened.efi' --unicode
+efibootmgr --create --disk ${DRIVE} --part 1 --label "Artix Linux (fallback initramfs)" --loader '\EFI\artix\artix-linux-hardened-fallback.efi' --unicode
 
 echo -en 'artix\nartix' | passwd
 
