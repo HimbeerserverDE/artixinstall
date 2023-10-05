@@ -45,6 +45,8 @@ This method works for all installation methods mentioned above.
 curl -fsSL https://raw.githubusercontent.com/HimbeerserverDE/artixinstall/main/<artix | uefi | crypt | cryptuefi>install | sh -s -- [drive [grubtarget]]
 ```
 
+The UEFI scripts will ignore the GRUB target as they skip it completely.
+
 # Partition Layout
 
 ## BIOS
