@@ -12,10 +12,9 @@ KEYMAP=$(get_cmdline keytable)
 
 DRIVE=$1
 PART_PREFIX=$2
-TARGET=$3
 
-if [[ -z "${DRIVE}" ]] | [[ -z "${PART_PREFIX}" ]] | [[ -z "${TARGET}" ]]; then
-	echo -e "\e[1m\e[1;31mUsage: mkuefi <drive> <partition prefix> <target>\e[0m"
+if [[ -z "${DRIVE}" ]] | [[ -z "${PART_PREFIX}" ]]; then
+	echo -e "\e[1m\e[1;31mUsage: mkuefi <drive> <partition prefix>\e[0m"
 	exit 1
 fi
 
@@ -31,6 +30,7 @@ export LC_COLLATE="C"
 EOT
 
 sed -i "s/keymap=\"us\"/keymap=\"${KEYMAP}\"/" /etc/conf.d/keymaps
+sed -i "s/KEYMAP=us/KEYMAP=${KEYMAP}/" /etc/vconsole.conf
 
 pacman -S --needed --noconfirm btrfs-progs grub os-prober efibootmgr
 grub-install --target=${TARGET} --efi-directory=/boot/efi --bootloader-id=grub
