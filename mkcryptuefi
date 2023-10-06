@@ -50,7 +50,7 @@ mkdir -p /boot/efi/EFI/artix
 useradd -m aur
 (cd /home/aur && git clone https://aur.archlinux.org/efistub-standalone.git)
 (cd /home/aur/efistub-standalone && su aur -l -c 'makepkg -rc')
-pacman -U /tmp/efistub-standalone/efistub-standalone-*.pkg.tar.zst
+pacman -U /home/aur/efistub-standalone/efistub-standalone-*.pkg.tar.zst
 userdel -r aur
 
 mkinitcpio -p linux-hardened
