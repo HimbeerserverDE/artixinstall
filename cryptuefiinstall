@@ -48,7 +48,7 @@ umount /btrfs
 
 mount -o compress=zstd,subvol=/root /dev/mapper/data_crypt /mnt
 mkdir /mnt/boot
-mount -o compress=zstd,subvol=/boot /mnt/boot
+mount -o compress=zstd,subvol=/boot /dev/mapper/data_crypt /mnt/boot
 mkdir /mnt/boot/efi
 mount ${PART_PREFIX}1 /mnt/boot/efi
 
