@@ -49,7 +49,7 @@ mkdir -p /boot/efi/EFI/artix
 
 useradd -m aur
 (cd /home/aur && git clone https://aur.archlinux.org/efistub-standalone.git)
-(cd /home/aur/efistub-standalone && su aur -l -c 'makepkg -rc')
+(cd /home/aur/efistub-standalone && su aur -c 'makepkg -rc')
 pacman -U /home/aur/efistub-standalone/efistub-standalone-*.pkg.tar.zst
 userdel -r aur
 
