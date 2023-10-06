@@ -47,6 +47,13 @@ sed -i 's/#fallback_uki="\/efi\/EFI\/Linux\/arch-linux-hardened\.efi"/fallback_u
 
 mkdir -p /boot/efi/EFI/artix
 
+useradd -M aur
+mkdir -p /tmp
+(cd /tmp && git clone https://aur.archlinux.org/efistub-standalone.git)
+(cd /tmp/efistub-standalone && su aur -l -c 'makepkg -rc')
+pacman -U /tmp/efistub-standalone/efistub-standalone-*.pkg.tar.zst
+userdel -r aur
+
 mkinitcpio -p linux-hardened
 
 efibootmgr --create --disk ${DRIVE} --part 1 --label "Artix Linux" --loader '\EFI\artix\artix-linux-hardened.efi' --unicode
