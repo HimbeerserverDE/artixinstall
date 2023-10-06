@@ -44,10 +44,9 @@ sed -i 's/#fallback_uki="\/efi\/EFI\/Linux\/arch-linux\.efi"/fallback_uki="\/boo
 
 mkdir -p /boot/efi/EFI/artix
 
-useradd -M aur
-mkdir -p /tmp
-(cd /tmp && git clone https://aur.archlinux.org/efistub-standalone.git)
-(cd /tmp/efistub-standalone && su aur -l -c 'makepkg -rc')
+useradd -m aur
+(cd /home/aur && git clone https://aur.archlinux.org/efistub-standalone.git)
+(cd /home/aur/efistub-standalone && su aur -l -c 'makepkg -rc')
 pacman -U /tmp/efistub-standalone/efistub-standalone-*.pkg.tar.zst
 userdel -r aur
 
