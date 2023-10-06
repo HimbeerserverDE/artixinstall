@@ -34,7 +34,7 @@ echo "KEYMAP=${KEYMAP}" > /etc/vconsole.conf
 
 sed -i "s/HOOKS=(base udev autodetect modconf kms keyboard keymap consolefont block filesystems fsck)/HOOKS=(base udev autodetect modconf kms keyboard keymap consolefont block encrypt filesystems fsck)/" /etc/mkinitcpio.conf
 
-pacman -S --needed --noconfirm btrfs-progs efibootmgr
+pacman -S --needed --noconfirm btrfs-progs efibootmgr device-mapper-openrc cryptsetup-openrc
 
 UUID_CRYPT=$(blkid -s UUID -o value ${PART_PREFIX}2)
 UUID_INNER=$(blkid -s UUID -o value /dev/mapper/data_crypt)
