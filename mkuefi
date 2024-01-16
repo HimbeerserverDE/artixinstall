@@ -40,7 +40,7 @@ mkdir -p /etc/kernel
 echo "loglevel=3 quiet root=UUID=${UUID} ro rootflags=subvol=root" > /etc/kernel/cmdline
 
 sed -i 's/#default_uki="\/efi\/EFI\/Linux\/arch-linux\.efi"/default_uki="\/boot\/efi\/EFI\/artix\/artix-linux.efi"/' /etc/mkinitcpio.d/linux.preset
-sed -i 's/#fallback_uki="\/efi\/EFI\/Linux\/arch-linux\.efi"/fallback_uki="\/boot\/efi\/EFI\/artix\/artix-linux-fallback.efi"/' /etc/mkinitcpio.d/linux.preset
+sed -i 's/#fallback_uki="\/efi\/EFI\/Linux\/arch-linux-fallback\.efi"/fallback_uki="\/boot\/efi\/EFI\/artix\/artix-linux-fallback.efi"/' /etc/mkinitcpio.d/linux.preset
 
 mkdir -p /boot/efi/EFI/artix
 

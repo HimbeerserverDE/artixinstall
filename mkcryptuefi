@@ -43,7 +43,7 @@ mkdir -p /etc/kernel
 echo "loglevel=3 quiet root=UUID=${UUID_INNER} ro rootflags=subvol=root cryptdevice=UUID=${UUID_CRYPT}:data_crypt" > /etc/kernel/cmdline
 
 sed -i 's/#default_uki="\/efi\/EFI\/Linux\/arch-linux-hardened\.efi"/default_uki="\/boot\/efi\/EFI\/artix\/artix-linux-hardened.efi"/' /etc/mkinitcpio.d/linux-hardened.preset
-sed -i 's/#fallback_uki="\/efi\/EFI\/Linux\/arch-linux-hardened\.efi"/fallback_uki="\/boot\/efi\/EFI\/artix\/artix-linux-hardened-fallback.efi"/' /etc/mkinitcpio.d/linux-hardened.preset
+sed -i 's/#fallback_uki="\/efi\/EFI\/Linux\/arch-linux-hardened-fallback\.efi"/fallback_uki="\/boot\/efi\/EFI\/artix\/artix-linux-hardened-fallback.efi"/' /etc/mkinitcpio.d/linux-hardened.preset
 
 mkdir -p /boot/efi/EFI/artix
 
