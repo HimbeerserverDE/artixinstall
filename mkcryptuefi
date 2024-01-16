@@ -59,8 +59,8 @@ pacman -Rns --noconfirm fakeroot
 
 mkinitcpio -p linux-hardened
 
-efibootmgr --create --disk ${DRIVE} --part 1 --label "Artix Linux" --loader '\EFI\artix\artix-linux-hardened.efi' --unicode
 efibootmgr --create --disk ${DRIVE} --part 1 --label "Artix Linux (fallback initramfs)" --loader '\EFI\artix\artix-linux-hardened-fallback.efi' --unicode
+efibootmgr --create --disk ${DRIVE} --part 1 --label "Artix Linux" --loader '\EFI\artix\artix-linux-hardened.efi' --unicode
 
 echo -en 'artix\nartix' | passwd
 
