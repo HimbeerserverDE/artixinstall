@@ -49,6 +49,25 @@ curl -fsSL https://raw.githubusercontent.com/HimbeerserverDE/artixinstall/main/<
 
 The UEFI scripts will ignore the GRUB target as they skip it completely.
 
+# Quirks
+
+## No UEFI boot entries on Dell Latitude E5270
+
+For some unknown reason this laptop refuses to list or boot any entries
+created by `efibootmgr`. This most likely can't be fixed in this script.
+A workaround is to add the entries from the UEFI setup menu
+(select the EFI partition, it should be the first partition on the OS drive):
+
+### Traditional Install
+
+* Artix Linux: `\EFI\artix\artix-linux.efi`
+* Artix Linux (fallback initramfs): `\EFI\artix\artix-linux-fallback.efi`
+
+### Encrypted Install
+
+* Artix Linux: `\EFI\artix\artix-linux-hardened.efi`
+* Artix Linux (fallback initramfs): `\EFI\artix\artix-linux-hardened-fallback.efi`
+
 # Partition Layout
 
 ## BIOS
