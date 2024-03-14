@@ -71,7 +71,7 @@ mount /dev/mapper/boot_crypt /mnt/boot
 rc-service ntpd start
 
 basestrap /mnt base openrc elogind-openrc vim man ntp-openrc git
-basestrap /mnt linux-hardened linux-lts linux-firmware
+basestrap /mnt linux-hardened linux-hardened-headers linux-lts linux-lts-headers linux-firmware
 
 artix-chroot /mnt bash -c "curl -fsSL https://raw.githubusercontent.com/HimbeerserverDE/artixinstall/main/mkcryptartix | sh -s -- ${DRIVE} ${PART_PREFIX} ${TARGET}"
 

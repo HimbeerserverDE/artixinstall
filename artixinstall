@@ -57,7 +57,7 @@ mount ${PART_PREFIX}1 /mnt/boot
 rc-service ntpd start
 
 basestrap /mnt base openrc elogind-openrc vim man ntp-openrc git
-basestrap /mnt linux linux-lts linux-firmware
+basestrap /mnt linux linux-headers linux-lts linux-lts-headers linux-firmware
 
 artix-chroot /mnt bash -c "curl -fsSL https://raw.githubusercontent.com/HimbeerserverDE/artixinstall/main/mkartix | sh -s -- ${DRIVE} ${PART_PREFIX} ${TARGET}"
 
