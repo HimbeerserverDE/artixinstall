@@ -65,6 +65,7 @@ grub-install --recheck --target=${TARGET} ${DRIVE}
 grub-mkconfig -o /boot/grub/grub.cfg
 
 mkinitcpio -p linux-hardened
+mkinitcpio -p linux-lts
 
 # Enable GRUB to unlock /boot
 CRYPTO_UUID=$(blkid -s UUID -o value ${PART_PREFIX}1 | tr -d -)

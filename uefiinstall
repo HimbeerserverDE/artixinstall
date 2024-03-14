@@ -27,8 +27,8 @@ else
 fi
 
 parted -s ${DRIVE} mklabel gpt
-parted -s -a optimal ${DRIVE} mkpart primary fat32 0% 256MiB
-parted -s -a optimal ${DRIVE} mkpart primary btrfs 256MiB 100%
+parted -s -a optimal ${DRIVE} mkpart primary fat32 0% 1GiB
+parted -s -a optimal ${DRIVE} mkpart primary btrfs 1GiB 100%
 
 mkfs.fat -F 32 ${PART_PREFIX}1 && fatlabel ${PART_PREFIX}1 ESP
 mkfs.btrfs -f ${PART_PREFIX}2
@@ -48,7 +48,7 @@ mount ${PART_PREFIX}1 /mnt/boot/efi
 rc-service ntpd start
 
 basestrap /mnt base openrc elogind-openrc vim man ntp-openrc git
-basestrap /mnt linux linux-firmware
+basestrap /mnt linux linux-lts linux-firmware
 
 artix-chroot /mnt bash -c "curl -fsSL https://raw.githubusercontent.com/HimbeerserverDE/artixinstall/main/mkuefi | sh -s -- ${DRIVE} ${PART_PREFIX}"
 

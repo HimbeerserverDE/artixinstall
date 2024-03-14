@@ -74,8 +74,8 @@ A workaround is to add the entries from the UEFI setup menu
 
 BIOS installations follow this disk layout:
 
-* /boot: ext4, 256 MiB
-* /: btrfs, 100% - 256 MiB, compress=zstd, subvol=/root
+* /boot: ext4, 1 GiB
+* /: btrfs, 100% - 1 GiB, compress=zstd, subvol=/root
 
 If FDE is used both partitions are LUKS2 containers. The boot partition uses
 PBKDF2 as its key derivation function.
@@ -84,6 +84,5 @@ PBKDF2 as its key derivation function.
 
 UEFI installations follow this disk layout:
 
-* /boot/efi: fat32, 256 MiB
-* /boot: ext4, 256 MiB
-* /: btrfs, 100% - 512 MiB, compress=zstd, subvol=/root
+* /boot/efi: fat32, 1 GiB
+* /: btrfs, 100% - 1 GiB, compress=zstd, subvol=/root

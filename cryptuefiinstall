@@ -31,8 +31,8 @@ fi
 #
 
 parted -s ${DRIVE} mklabel gpt
-parted -s -a optimal ${DRIVE} mkpart primary fat32 0% 256MiB
-parted -s -a optimal ${DRIVE} mkpart primary ext4 256MiB 100%
+parted -s -a optimal ${DRIVE} mkpart primary fat32 0% 1GiB
+parted -s -a optimal ${DRIVE} mkpart primary ext4 1GiB 100%
 
 echo "artix" | cryptsetup -q --pbkdf pbkdf2 luksFormat ${PART_PREFIX}2
 echo "artix" | cryptsetup -q open ${PART_PREFIX}2 data_crypt
@@ -59,7 +59,7 @@ mount ${PART_PREFIX}1 /mnt/boot/efi
 rc-service ntpd start
 
 basestrap /mnt base openrc elogind-openrc vim man ntp-openrc git
-basestrap /mnt linux-hardened linux-firmware
+basestrap /mnt linux-hardened linux-lts linux-firmware
 
 artix-chroot /mnt bash -c "curl -fsSL https://raw.githubusercontent.com/HimbeerserverDE/artixinstall/main/mkcryptuefi | sh -s -- ${DRIVE} ${PART_PREFIX}"
 

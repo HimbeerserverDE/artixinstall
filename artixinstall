@@ -39,8 +39,8 @@ if [ -z "${TARGET}" ]; then
 fi
 
 parted -s ${DRIVE} mklabel msdos
-parted -s -a optimal ${DRIVE} mkpart primary ext4 0% 256MiB
-parted -s -a optimal ${DRIVE} mkpart primary btrfs 256MiB 100%
+parted -s -a optimal ${DRIVE} mkpart primary ext4 0% 1GiB
+parted -s -a optimal ${DRIVE} mkpart primary btrfs 1GiB 100%
 
 mkfs.ext4 -F -L BOOT ${PART_PREFIX}1
 mkfs.btrfs -f ${PART_PREFIX}2
@@ -57,7 +57,7 @@ mount ${PART_PREFIX}1 /mnt/boot
 rc-service ntpd start
 
 basestrap /mnt base openrc elogind-openrc vim man ntp-openrc git
-basestrap /mnt linux linux-firmware
+basestrap /mnt linux linux-lts linux-firmware
 
 artix-chroot /mnt bash -c "curl -fsSL https://raw.githubusercontent.com/HimbeerserverDE/artixinstall/main/mkartix | sh -s -- ${DRIVE} ${PART_PREFIX} ${TARGET}"
 

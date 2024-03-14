@@ -41,6 +41,8 @@ echo "loglevel=3 quiet root=UUID=${UUID} ro rootflags=subvol=root" > /etc/kernel
 
 sed -i 's/#default_uki="\/efi\/EFI\/Linux\/arch-linux\.efi"/default_uki="\/boot\/efi\/EFI\/artix\/artix-linux.efi"/' /etc/mkinitcpio.d/linux.preset
 sed -i 's/#fallback_uki="\/efi\/EFI\/Linux\/arch-linux-fallback\.efi"/fallback_uki="\/boot\/efi\/EFI\/artix\/artix-linux-fallback.efi"/' /etc/mkinitcpio.d/linux.preset
+sed -i 's/#default_uki="\/efi\/EFI\/Linux\/arch-linux-lts\.efi"/default_uki="\/boot\/efi\/EFI\/artix\/artix-linux-lts.efi"/' /etc/mkinitcpio.d/linux-lts.preset
+sed -i 's/#fallback_uki="\/efi\/EFI\/Linux\/arch-linux-lts-fallback\.efi"/fallback_uki="\/boot\/efi\/EFI\/artix\/artix-linux-lts-fallback.efi"/' /etc/mkinitcpio.d/linux-lts.preset
 
 mkdir -p /boot/efi/EFI/artix
 
@@ -55,7 +57,10 @@ userdel -r aur
 pacman -Rns --noconfirm fakeroot
 
 mkinitcpio -p linux
+mkinitcpio -p linux-lts
 
+efibootmgr --create --disk ${DRIVE} --part 1 --label "Artix Linux LTS (fallback initramfs)" --loader '\EFI\artix\artix-linux-lts-fallback.efi' --unicode
+efibootmgr --create --disk ${DRIVE} --part 1 --label "Artix Linux LTS" --loader '\EFI\artix\artix-linux-lts.efi' --unicode
 efibootmgr --create --disk ${DRIVE} --part 1 --label "Artix Linux (fallback initramfs)" --loader '\EFI\artix\artix-linux-fallback.efi' --unicode
 efibootmgr --create --disk ${DRIVE} --part 1 --label "Artix Linux" --loader '\EFI\artix\artix-linux.efi' --unicode
 

@@ -43,8 +43,8 @@ fi
 #
 
 parted -s ${DRIVE} mklabel msdos
-parted -s -a optimal ${DRIVE} mkpart primary ext4 0% 256MiB
-parted -s -a optimal ${DRIVE} mkpart primary ext4 256MiB 100%
+parted -s -a optimal ${DRIVE} mkpart primary ext4 0% 1GiB
+parted -s -a optimal ${DRIVE} mkpart primary ext4 1GiB 100%
 
 echo "artix" | cryptsetup -q --pbkdf pbkdf2 luksFormat ${PART_PREFIX}1
 echo "artix" | cryptsetup -q open ${PART_PREFIX}1 boot_crypt
@@ -71,7 +71,7 @@ mount /dev/mapper/boot_crypt /mnt/boot
 rc-service ntpd start
 
 basestrap /mnt base openrc elogind-openrc vim man ntp-openrc git
-basestrap /mnt linux-hardened linux-firmware
+basestrap /mnt linux-hardened linux-lts linux-firmware
 
 artix-chroot /mnt bash -c "curl -fsSL https://raw.githubusercontent.com/HimbeerserverDE/artixinstall/main/mkcryptartix | sh -s -- ${DRIVE} ${PART_PREFIX} ${TARGET}"
 
