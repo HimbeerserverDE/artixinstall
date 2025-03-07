@@ -139,12 +139,6 @@ cat <<EOT >> /etc/pacman.conf
 [extra]
 Include = /etc/pacman.d/mirrorlist-arch
 
-#[community-testing]
-#Include = /etc/pacman.d/mirrorlist-arch
-
-[community]
-Include = /etc/pacman.d/mirrorlist-arch
-
 #[multilib-testing]
 #Include = /etc/pacman.d/mirrorlist-arch
 
